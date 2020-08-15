@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Fun</title>
+    <script defer src="index.js"></script>
+</head>
+<body>
+    <nav></nav>
+    <div>
+        <input type='color' id='color-change'>brush color</input>
+        <input type='color' id='background-change'>background</input>
+        <select id="brush">
+            <option value=1>small</option>
+            <option value="10">medium</option>
+            <option value="20">large</option>
+        </select>
+        <button id="save">save</button>
+        <button id="upload">upload</button>
+    </div>
+    <div style="">
+        <canvas id="layer1" width=500 height=500 
+          style="border: 1px solid; z-index: 0;"></canvas>
+        <canvas id="layer2" width=500 height=500
+          style="position: absolute; left: 9px; top: 35px; z-index: 1;"></canvas>
+    </div>
+    <div style="position: relative" id="image-display"></div>
+</body>
+</html>
