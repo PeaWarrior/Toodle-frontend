@@ -1,0 +1,18 @@
+* {
+    box-sizing: border-box;
+}
+
+.columns {
+    height: 90vh;
+    border: 2px solid black;
+}
+
+#tools {
+    height: 50vh;
+    border: 5px solid aqua;
+}
+
+#tool-options {
+    height: 40vh;
+    border: 5px solid darkgoldenrod;
+}

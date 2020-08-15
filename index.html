@@ -3,28 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Fun</title>
+    <title>Snap-Paint</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="./normalize.css">
+    <link rel="stylesheet" href="./style.css">
     <script defer src="index.js"></script>
 </head>
 <body>
-    <nav></nav>
-    <div>
-        <input type='color' id='color-change'>brush color</input>
-        <input type='color' id='background-change'>background</input>
-        <select id="brush">
-            <option value=1>small</option>
-            <option value="10">medium</option>
-            <option value="20">large</option>
-        </select>
-        <button id="save">save</button>
-        <button id="upload">upload</button>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Features</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Pricing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+            </li>
+          </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 columns">
+                <div class="row" id="tools">Tools</div>
+                <div class="row" id="tool-options">Tool Options</div>
+            </div>
+            <div class="col-md-10 columns">
+                <canvas id="layer1" width=500 height=500 style="border: 1px solid; z-index: 0;"></canvas>
+                <canvas id="layer2" width=500 height=500 style="position: absolute; left: 9px; top: 35px; z-index: 1;"></canvas>
+            </div>
+        </div>
     </div>
-    <div style="">
-        <canvas id="layer1" width=500 height=500 
-          style="border: 1px solid; z-index: 0;"></canvas>
-        <canvas id="layer2" width=500 height=500
-          style="position: absolute; left: 9px; top: 35px; z-index: 1;"></canvas>
-    </div>
-    <div style="position: relative" id="image-display"></div>
 </body>
 </html>
