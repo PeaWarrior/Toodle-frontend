@@ -16,7 +16,7 @@ let canvas = document.createElement('canvas')
 
 canvasContainer.append(background, canvas)
 let ctx = canvas.getContext('2d')
-// ctx.globalCompositeOperation = 'darker'
+// ctx.globalCompositeOperation = 'xor'
 
 // default
 ctx.lineJoin = 'round'
@@ -42,13 +42,18 @@ function mouseDownHandler(e) {
     toggleDraw = true
     lastPoint = {x: e.offsetX, y: e.offsetY}
     points.push(lastPoint)
-    drawPoints(ctx, points)
+    if (ctx.globalCompositeOperation !== 'destination-out') {
+        drawPoints(ctx, points)
+    }
 }
+const blender = document.querySelector('select#blend')
 
 function draw(e) {
     if (toggleDraw) {
         ctx.clearRect(0, 0, 700, 500)
+        ctx.globalCompositeOperation = 'source-over'
         ctx.drawImage(canvasStates[canvasStates.length-1], 0, 0)
+        ctx.globalCompositeOperation = blender.value
         lastPoint = {x: e.offsetX, y: e.offsetY}
         points.push(lastPoint)
         drawPoints(ctx, points)
@@ -56,6 +61,12 @@ function draw(e) {
 }
 
 function drawPoints(ctx, points) {
+    // const blender = document.querySelector('select#blend')
+    // ctx.globalCompositeOperation = blender.value
+    // blender.addEventListener('change', function(e) {
+    //     console.log(this.value)
+    //     ctx.globalCompositeOperation = this.value
+    // })
     if (points.length < 6) {
         let firstPoint = points[0];
         ctx.beginPath()
@@ -96,12 +107,14 @@ function createNewCanvasState() {
     }
 }
 
+
 // undo
 const undoBtn = document.querySelector('button#undo')
 undoBtn.addEventListener('click', undoBtnHandler)
 
 function undoBtnHandler() {
     if (canvasStates.length >= 2) {
+        ctx.globalCompositeOperation = 'copy'
         ctx.clearRect(0, 0, 700, 500)
         ctx.drawImage(canvasStates[canvasStates.length-2], 0, 0)
         canvasRedoStates.push(canvasStates.pop())
