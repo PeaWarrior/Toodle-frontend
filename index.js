@@ -1,8 +1,10 @@
 const canvasContainer = document.querySelector('div.grid')
+
 let background = document.createElement('canvas')
     background.width = 1000
     background.height = 500
     background.className = "canvas bg"
+
 let canvas = document.createElement('canvas')
     canvas.className = "canvas first"
     canvas.width = 1000
@@ -10,42 +12,73 @@ let canvas = document.createElement('canvas')
 
 canvasContainer.append(background, canvas)
 
-
-// let background = document.querySelector('canvas#layer1')
-// let canvas = document.querySelector('canvas#layer2')
-
-let drawX, drawY
 let ctx = canvas.getContext('2d')
+// default
 ctx.lineJoin = 'round'
 ctx.lineCap = 'round'
-
-
-// default
 ctx.strokeStyle = 'rgba(0, 0, 0)'
+ctx.fillStyle = 'rgba(0, 0, 0)'
 ctx.lineWidth = 5
+
 let toggleDraw = false
+let lastPoint
 
-canvas.addEventListener('mousedown', (e) => {
-    drawX = e.offsetX
-    drawY = e.offsetY
+let memoryCanvas = document.createElement('canvas');
+    memoryCanvas.width = 1000;
+    memoryCanvas.height = 500;
+let memoryCtx = memoryCanvas.getContext('2d');
+let points = [];
+
+canvas.addEventListener('mousedown', mouseDownHandler);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', mouseUpHandler);
+canvas.addEventListener('mouseout', mouseUpHandler);
+
+function mouseDownHandler(e) {
     toggleDraw = true
-});
+    lastPoint = {x: e.offsetX, y: e.offsetY}
+    points.push(lastPoint)
+    drawPoints(ctx, points)
+}
 
-let draw = (e) => {
+function draw(e) {
     if (toggleDraw) {
-        ctx.beginPath()
-        ctx.moveTo(drawX, drawY)
-        ctx.lineTo(e.offsetX, e.offsetY)
-        ctx.stroke()
-        drawX = e.offsetX
-        drawY = e.offsetY
+        ctx.clearRect(0, 0, 1000, 500)
+        ctx.drawImage(memoryCanvas, 0, 0)
+        lastPoint = {x: e.offsetX, y: e.offsetY}
+        points.push(lastPoint)
+        drawPoints(ctx, points)
     }
 }
 
+function drawPoints(ctx, points) {
+    if (points.length < 6) {
+        let firstPoint = points[0];
+        ctx.beginPath()
+        ctx.arc(firstPoint.x, firstPoint.y, ctx.lineWidth / 2, 0, Math.PI * 2, !0)
+        ctx.closePath()
+        ctx.fill();
+        return
+    }
+    ctx.beginPath()
+    ctx.moveTo(points[0].x, points[0].y)
+    for (i = 1; i < points.length - 2; i++) {
+        let a = (points[i].x + points[i + 1].x)/2,
+            b = (points[i].y + points[i + 1].y)/2
+            ctx.quadraticCurveTo(points[i].x, points[i].y, a, b)
+        }
+    ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i +1].y)
+    ctx.stroke()
+}
 
-canvas.addEventListener('mousemove', draw)
-canvas.addEventListener('mouseup', (e) => toggleDraw = false)
-canvas.addEventListener('mouseout', (e) => toggleDraw = false)
+function mouseUpHandler(e) {
+    if (toggleDraw) {
+        toggleDraw = false
+        memoryCtx.clearRect(0, 0, 1000, 500)
+        memoryCtx.drawImage(canvas, 0, 0)
+        points = [];
+    }
+}
 
 // stroke color changer
 const strokeColorInput = document.querySelector('input#stroke-color-input')
@@ -53,6 +86,7 @@ strokeColorInput.addEventListener('input', changeStrokeColor);
 
 function changeStrokeColor() {
     ctx.strokeStyle = hexToRGB(strokeColorInput.value, (100-opacityInput.value)/100)
+    ctx.fillStyle = hexToRGB(strokeColorInput.value, (100-opacityInput.value)/100)
 };
 
 // stroke size changer
