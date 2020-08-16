@@ -5,6 +5,10 @@ let background = document.createElement('canvas')
     background.height = 500
     background.className = "canvas bg"
 
+    let backgroundCtx = background.getContext('2d')
+    backgroundCtx.fillStyle = 'rgba(255, 255, 255)'
+    backgroundCtx.fillRect(0, 0, background.width, background.height)
+
 let canvas = document.createElement('canvas')
     canvas.className = "canvas first"
     canvas.width = 700
@@ -12,6 +16,7 @@ let canvas = document.createElement('canvas')
 
 canvasContainer.append(background, canvas)
 let ctx = canvas.getContext('2d')
+// ctx.globalCompositeOperation = 'darker'
 
 // default
 ctx.lineJoin = 'round'
@@ -23,16 +28,15 @@ ctx.lineWidth = 5
 let toggleDraw = false
 let lastPoint
 
-let memoryCanvas = document.createElement('canvas');
-    memoryCanvas.width = 700;
-    memoryCanvas.height = 500;
-let memoryCtx = memoryCanvas.getContext('2d');
-let points = [];
+let points = []
+let canvasStates = []
+let canvasRedoStates = []
+canvasStates.push(canvas)
 
-canvas.addEventListener('mousedown', mouseDownHandler);
-canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('mouseup', mouseUpHandler);
-canvas.addEventListener('mouseout', mouseUpHandler);
+canvas.addEventListener('mousedown', mouseDownHandler)
+canvas.addEventListener('mousemove', draw)
+canvas.addEventListener('mouseup', mouseUpHandler)
+canvas.addEventListener('mouseout', mouseUpHandler)
 
 function mouseDownHandler(e) {
     toggleDraw = true
@@ -44,7 +48,7 @@ function mouseDownHandler(e) {
 function draw(e) {
     if (toggleDraw) {
         ctx.clearRect(0, 0, 700, 500)
-        ctx.drawImage(memoryCanvas, 0, 0)
+        ctx.drawImage(canvasStates[canvasStates.length-1], 0, 0)
         lastPoint = {x: e.offsetX, y: e.offsetY}
         points.push(lastPoint)
         drawPoints(ctx, points)
@@ -74,9 +78,45 @@ function drawPoints(ctx, points) {
 function mouseUpHandler(e) {
     if (toggleDraw) {
         toggleDraw = false
-        memoryCtx.clearRect(0, 0, 700, 500)
-        memoryCtx.drawImage(canvas, 0, 0)
+        createNewCanvasState()
         points = [];
+    }
+}
+
+function createNewCanvasState() {
+    let canvasState = document.createElement('canvas');
+        canvasState.width = 700;
+        canvasState.height = 500;
+    let cachedCtx = canvasState.getContext('2d');
+        cachedCtx.drawImage(canvas, 0, 0)
+    canvasStates.push(canvasState)
+
+    if (canvasStates.length > 5) {
+        canvasStates.shift()
+    }
+}
+
+// undo
+const undoBtn = document.querySelector('button#undo')
+undoBtn.addEventListener('click', undoBtnHandler)
+
+function undoBtnHandler() {
+    if (canvasStates.length >= 2) {
+        ctx.clearRect(0, 0, 700, 500)
+        ctx.drawImage(canvasStates[canvasStates.length-2], 0, 0)
+        canvasRedoStates.push(canvasStates.pop())
+    }
+}
+
+// redo
+const redoBtn = document.querySelector('button#redo')
+redoBtn.addEventListener('click', redoBtnHandler)
+
+function redoBtnHandler() {
+    if (canvasRedoStates.length >= 1) {
+        ctx.clearRect(0, 0, 700, 500)
+        ctx.drawImage(canvasRedoStates[canvasRedoStates.length-1], 0, 0)
+        canvasStates.push(canvasRedoStates.pop())
     }
 }
 
@@ -94,7 +134,6 @@ const strokeSizeInput = document.querySelector('input#stroke-size-input')
 const strokeSizeSlider = document.querySelector('input#stroke-size-slider')
 
 strokeSizeInput.addEventListener('input', changeStrokeSize)
-// strokeSizeInput.addEventListener('onhover', strokeSizeInput.select())
 strokeSizeSlider.addEventListener('input', changeStrokeSize)
 
 function changeStrokeSize() {
@@ -132,18 +171,18 @@ function hexToRGB(hex, alpha) {
 }
 
 // background changer
-let backgroundCtx = background.getContext('2d')
-backgroundCtx.fillStyle = 'white'
-backgroundCtx.fillRect(0, 0, canvas.width, canvas.height)
+// let backgroundCtx = background.getContext('2d')
+// backgroundCtx.fillStyle = 'white'
+// backgroundCtx.fillRect(0, 0, canvas.width, canvas.height)
 
-let backgroundColor = document.querySelector('input#background-change')
-    backgroundColor.value = '#ffffff'
-backgroundColor.addEventListener('input', (e) => {
-    console.log(e.target.value)
+// let backgroundColor = document.querySelector('input#background-change')
+//     backgroundColor.value = '#ffffff'
+// backgroundColor.addEventListener('input', (e) => {
+//     console.log(e.target.value)
     
-    backgroundCtx.fillStyle = e.target.value
-    backgroundCtx.fillRect(0, 0, background.width, background.height)
-})
+//     backgroundCtx.fillStyle = e.target.value
+//     backgroundCtx.fillRect(0, 0, background.width, background.height)
+// })
 
 // saving image
 let save = document.querySelector('button#save')
