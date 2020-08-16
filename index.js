@@ -1,18 +1,18 @@
 const canvasContainer = document.querySelector('div.grid')
 
 let background = document.createElement('canvas')
-    background.width = 1000
+    background.width = 700
     background.height = 500
     background.className = "canvas bg"
 
 let canvas = document.createElement('canvas')
     canvas.className = "canvas first"
-    canvas.width = 1000
+    canvas.width = 700
     canvas.height = 500
 
 canvasContainer.append(background, canvas)
-
 let ctx = canvas.getContext('2d')
+
 // default
 ctx.lineJoin = 'round'
 ctx.lineCap = 'round'
@@ -24,7 +24,7 @@ let toggleDraw = false
 let lastPoint
 
 let memoryCanvas = document.createElement('canvas');
-    memoryCanvas.width = 1000;
+    memoryCanvas.width = 700;
     memoryCanvas.height = 500;
 let memoryCtx = memoryCanvas.getContext('2d');
 let points = [];
@@ -43,7 +43,7 @@ function mouseDownHandler(e) {
 
 function draw(e) {
     if (toggleDraw) {
-        ctx.clearRect(0, 0, 1000, 500)
+        ctx.clearRect(0, 0, 700, 500)
         ctx.drawImage(memoryCanvas, 0, 0)
         lastPoint = {x: e.offsetX, y: e.offsetY}
         points.push(lastPoint)
@@ -74,7 +74,7 @@ function drawPoints(ctx, points) {
 function mouseUpHandler(e) {
     if (toggleDraw) {
         toggleDraw = false
-        memoryCtx.clearRect(0, 0, 1000, 500)
+        memoryCtx.clearRect(0, 0, 700, 500)
         memoryCtx.drawImage(canvas, 0, 0)
         points = [];
     }
@@ -94,6 +94,7 @@ const strokeSizeInput = document.querySelector('input#stroke-size-input')
 const strokeSizeSlider = document.querySelector('input#stroke-size-slider')
 
 strokeSizeInput.addEventListener('input', changeStrokeSize)
+// strokeSizeInput.addEventListener('onhover', strokeSizeInput.select())
 strokeSizeSlider.addEventListener('input', changeStrokeSize)
 
 function changeStrokeSize() {
@@ -116,6 +117,7 @@ function changeStrokeOpacity() {
 }
 
 // helpers
+
 function isLegitValue(input, min, max) {
     input.value > max ? input.value = max : input.value
     input.value < min ? input.value = min : input.value
