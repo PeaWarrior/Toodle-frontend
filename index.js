@@ -1,4 +1,5 @@
 const canvasContainer = document.querySelector('div.grid')
+const toolsBar = document.querySelector('div#tools')
 
 let background = document.createElement('canvas')
     background.width = 700
@@ -16,7 +17,6 @@ let canvas = document.createElement('canvas')
 
 canvasContainer.append(background, canvas)
 let ctx = canvas.getContext('2d')
-// ctx.globalCompositeOperation = 'xor'
 
 // default
 ctx.lineJoin = 'round'
@@ -24,6 +24,8 @@ ctx.lineCap = 'round'
 ctx.strokeStyle = 'rgba(0, 0, 0)'
 ctx.fillStyle = 'rgba(0, 0, 0)'
 ctx.lineWidth = 5
+
+let currentBrush = 'source-over'
 
 let toggleDraw = false
 let lastPoint
@@ -42,31 +44,22 @@ function mouseDownHandler(e) {
     toggleDraw = true
     lastPoint = {x: e.offsetX, y: e.offsetY}
     points.push(lastPoint)
-    if (ctx.globalCompositeOperation !== 'destination-out') {
-        drawPoints(ctx, points)
-    }
+    drawPoints(ctx, points)
 }
-const blender = document.querySelector('select#blend')
 
 function draw(e) {
     if (toggleDraw) {
-        ctx.clearRect(0, 0, 700, 500)
         ctx.globalCompositeOperation = 'source-over'
+        ctx.clearRect(0, 0, 700, 500)
         ctx.drawImage(canvasStates[canvasStates.length-1], 0, 0)
-        ctx.globalCompositeOperation = blender.value
         lastPoint = {x: e.offsetX, y: e.offsetY}
         points.push(lastPoint)
+        ctx.globalCompositeOperation = currentBrush
         drawPoints(ctx, points)
     }
 }
 
 function drawPoints(ctx, points) {
-    // const blender = document.querySelector('select#blend')
-    // ctx.globalCompositeOperation = blender.value
-    // blender.addEventListener('change', function(e) {
-    //     console.log(this.value)
-    //     ctx.globalCompositeOperation = this.value
-    // })
     if (points.length < 6) {
         let firstPoint = points[0];
         ctx.beginPath()
@@ -133,13 +126,55 @@ function redoBtnHandler() {
     }
 }
 
+// normalBtn
+const normalBtn = document.querySelector('button#normal')
+normalBtn.dataset.brush = 'source-over'
+normalBtn.addEventListener('click', btnHandler)
+
+// eraseBtn
+const eraseBtn = document.querySelector('button#erase')
+eraseBtn.dataset.brush = 'destination-out'
+eraseBtn.addEventListener('click', btnHandler)
+
+// multiplyBtn
+const multiplyBtn = document.querySelector('button#multiply')
+multiplyBtn.dataset.brush = 'multiply'
+multiplyBtn.addEventListener('click', btnHandler)
+
+// screenBtn
+const screenBtn = document.querySelector('button#screen')
+screenBtn.dataset.brush = 'screen'
+screenBtn.addEventListener('click', btnHandler)
+
+// darkenBtn
+const darkenBtn = document.querySelector('button#darken')
+darkenBtn.dataset.brush = 'darken'
+darkenBtn.addEventListener('click', btnHandler)
+
+// lightenBtn
+const lightenBtn = document.querySelector('button#lighten')
+lightenBtn.dataset.brush = 'lighten'
+lightenBtn.addEventListener('click', btnHandler)
+
+// differenceBtn
+const differenceBtn = document.querySelector('button#difference')
+differenceBtn.dataset.brush = 'difference'
+differenceBtn.addEventListener('click', btnHandler)
+
+function btnHandler() {
+    let btns = toolsBar.querySelectorAll('button')
+    btns.forEach(button => button.classList.remove('selected'));
+    this.classList.add('selected')
+    currentBrush = this.dataset.brush
+}
+
 // stroke color changer
 const strokeColorInput = document.querySelector('input#stroke-color-input')
 strokeColorInput.addEventListener('input', changeStrokeColor);
 
 function changeStrokeColor() {
-    ctx.strokeStyle = hexToRGB(strokeColorInput.value, (100-opacityInput.value)/100)
-    ctx.fillStyle = hexToRGB(strokeColorInput.value, (100-opacityInput.value)/100)
+    ctx.strokeStyle = hexToRGB(strokeColorInput.value, (opacityInput.value)/100)
+    ctx.fillStyle = hexToRGB(strokeColorInput.value, (opacityInput.value)/100)
 };
 
 // stroke size changer
