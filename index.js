@@ -1,7 +1,19 @@
-let background = document.querySelector('canvas#layer1')
-let canvas = document.querySelector('canvas#layer2')
-// canvas.style.border = '1px solid'
-// canvas.style['box-sizing'] = 'border-box'
+const canvasContainer = document.querySelector('div.grid')
+let background = document.createElement('canvas')
+    background.width = 1000
+    background.height = 700
+    background.className = "canvas bg"
+let canvas = document.createElement('canvas')
+    canvas.className = "canvas first"
+    canvas.width = 1000
+    canvas.height = 700
+
+canvasContainer.append(background, canvas)
+
+
+// let background = document.querySelector('canvas#layer1')
+// let canvas = document.querySelector('canvas#layer2')
+
 let drawX, drawY
 let ctx = canvas.getContext('2d')
 ctx.lineJoin = 'round'
@@ -9,16 +21,13 @@ ctx.lineCap = 'round'
 
 
 // change color
-// ctx.strokeStyle = '#B4D455'
-// ctx.fillStyle = '#8'
+ctx.strokeStyle = 'black'
 ctx.lineWidth = 1
 let toggleDraw = false
 
 canvas.addEventListener('mousedown', (e) => {
     drawX = e.offsetX
     drawY = e.offsetY
-    // [drawX, drawY] = [e.offsetX, e.offsetY]
-    
     toggleDraw = true
 });
 
@@ -28,7 +37,6 @@ let draw = (e) => {
         ctx.moveTo(drawX, drawY)
         ctx.lineTo(e.offsetX, e.offsetY)
         ctx.stroke()
-        // ctx.fill()
         drawX = e.offsetX
         drawY = e.offsetY
     }
@@ -41,11 +49,12 @@ canvas.addEventListener('mouseout', (e) => toggleDraw = false)
 
 // colorchanger
 
-const colorChanger = document.querySelector('input#color-change')
-colorChanger.addEventListener('input', (e) => {
-    ctx.strokeStyle = e.target.value
+// const colorChanger = document.querySelector('input#color-change')
+// colorChanger.addEventListener('input', (e) => {
+//     ctx.strokeStyle = e.target.value
     
-})
+// })
+
 // linewidth changer
 let brushSize = document.querySelector('select#brush')
 
@@ -67,7 +76,6 @@ backgroundColor.addEventListener('input', (e) => {
     backgroundCtx.fillRect(0, 0, background.width, background.height)
 })
 
-let asda
 // saving image
 let save = document.querySelector('button#save')
 let img = document.querySelector('img')

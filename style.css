@@ -16,3 +16,28 @@
     height: 40vh;
     border: 5px solid darkgoldenrod;
 }
+
+/* FOR GRID */
+
+.grid {
+    display: grid;
+    grid-template-columns: auto;
+    padding: 25px;
+    max-width: 1024px;
+    min-width: 320px;
+}
+
+.canvas {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%
+}
+
+.bg {
+    border: 1px solid red;
+    z-index: 0;
+}
+.first {
+    border: 1px solid green;
+    z-index: 1;
+}
