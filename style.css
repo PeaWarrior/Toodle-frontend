@@ -2,6 +2,12 @@
     box-sizing: border-box;
 }
 
+html, body {
+    width:100%;
+    height:100%;
+    margin:0;
+    }
+
 .columns {
     height: 90vh;
     border: 2px solid black;
@@ -23,14 +29,17 @@
     display: grid;
     grid-template-columns: auto;
     padding: 25px;
-    max-width: 1024px;
-    min-width: 320px;
+    /* max-width: 1200px;
+    min-width: 700px; */
 }
 
 .canvas {
     grid-column: 1;
     grid-row: 1;
-    width: 100%
+    /* width: 100% */
+    /* position:fixed;
+    left: 100;
+    top: 100; */
 }
 
 .bg {

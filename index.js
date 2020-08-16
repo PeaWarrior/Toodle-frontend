@@ -156,3 +156,4 @@ function displayImages(artObj) {
     const imageDisplay = document.querySelector('div#image-display')
     imageDisplay.append(img)
 }
+
