@@ -86,8 +86,35 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2 columns">
-                <div class="row" id="tools">Tools</div>
-                <div class="row" id="tool-options">Tool Options</div>
+                <div class="row" id="tools">
+                </div>
+                <div class="row" id="tool-options">Tool Options
+
+                  <div id="stroke-options" class="d-flex flex-column">
+                    
+                    <div id="stroke-color-options">
+                      <label for="stroke-color" style="width: 100px">Brush Color</label>
+                      <input type="color" id="stroke-color-input">
+                    </div>
+                    
+
+                    <div id="stroke-size-options">
+                      <label for="stroke-size">Brush Size</label><br>
+                      <input type="range" min="1" max="100" value="5" style="width: 100px" name="stroke-size"id="stroke-size-slider">
+                      <input type="number" min="0" max="75" value="5" style="width: 50px" id="stroke-size-input">
+                      <span>px</span>
+                    </div>
+
+                    <div id="opacity-options">
+                      <label for="opacity">Opacity</label><br>
+                      <input type="range" min="0" max="100" value="0" style="width: 100px" name="opacity"id="opacity-slider">
+                      <input type="number" min="0" max="100" value="0" style="width: 50px" id="opacity-input">
+                      <span>%</span>
+                    </div>
+
+                  </div>
+
+                </div>
             </div>
             <div class="col-md-10 columns grid">
                 <!-- <canvas class="canvas" id="layer1" style="border: 3px solid black; z-index: 0;"></canvas>

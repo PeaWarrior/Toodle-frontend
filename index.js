@@ -1,12 +1,12 @@
 const canvasContainer = document.querySelector('div.grid')
 let background = document.createElement('canvas')
     background.width = 1000
-    background.height = 700
+    background.height = 500
     background.className = "canvas bg"
 let canvas = document.createElement('canvas')
     canvas.className = "canvas first"
     canvas.width = 1000
-    canvas.height = 700
+    canvas.height = 500
 
 canvasContainer.append(background, canvas)
 
@@ -20,9 +20,9 @@ ctx.lineJoin = 'round'
 ctx.lineCap = 'round'
 
 
-// change color
-ctx.strokeStyle = 'black'
-ctx.lineWidth = 1
+// default
+ctx.strokeStyle = 'rgba(0, 0, 0)'
+ctx.lineWidth = 5
 let toggleDraw = false
 
 canvas.addEventListener('mousedown', (e) => {
@@ -47,20 +47,53 @@ canvas.addEventListener('mousemove', draw)
 canvas.addEventListener('mouseup', (e) => toggleDraw = false)
 canvas.addEventListener('mouseout', (e) => toggleDraw = false)
 
-// colorchanger
+// stroke color changer
+const strokeColorInput = document.querySelector('input#stroke-color-input')
+strokeColorInput.addEventListener('input', changeStrokeColor);
 
-// const colorChanger = document.querySelector('input#color-change')
-// colorChanger.addEventListener('input', (e) => {
-//     ctx.strokeStyle = e.target.value
-    
-// })
+function changeStrokeColor() {
+    ctx.strokeStyle = hexToRGB(strokeColorInput.value, (100-opacityInput.value)/100)
+};
 
-// linewidth changer
-let brushSize = document.querySelector('select#brush')
+// stroke size changer
+const strokeSizeInput = document.querySelector('input#stroke-size-input')
+const strokeSizeSlider = document.querySelector('input#stroke-size-slider')
 
-brushSize.addEventListener('change', (e) => {
-    ctx.lineWidth = parseInt(e.target.value)
-})
+strokeSizeInput.addEventListener('input', changeStrokeSize)
+strokeSizeSlider.addEventListener('input', changeStrokeSize)
+
+function changeStrokeSize() {
+    isLegitValue(this, 1, 100)
+    this.id === 'stroke-size-input' ? strokeSizeSlider.value = this.value : strokeSizeInput.value = this.value
+    ctx.lineWidth = parseInt(this.value)
+}
+
+// stroke opacity changer
+const opacityInput = document.querySelector('input#opacity-input')
+const opacitySlider = document.querySelector('input#opacity-slider')
+
+opacityInput.addEventListener('input', changeStrokeOpacity)
+opacitySlider.addEventListener('input', changeStrokeOpacity)
+
+function changeStrokeOpacity() {
+    isLegitValue(this, 0, 100)
+    this.id === 'opacity-input' ? opacitySlider.value = this.value : opacityInput.value = this.value
+    changeStrokeColor()
+}
+
+// helpers
+function isLegitValue(input, min, max) {
+    input.value > max ? input.value = max : input.value
+    input.value < min ? input.value = min : input.value
+}
+
+function hexToRGB(hex, alpha) {
+    let r = parseInt(hex.slice(1, 3), 16),
+        g = parseInt(hex.slice(3, 5), 16),
+        b = parseInt(hex.slice(5, 7), 16);
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
 
 // background changer
 let backgroundCtx = background.getContext('2d')
