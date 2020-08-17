@@ -14,16 +14,37 @@ html, body {
 }
 
 #tools {
-    height: 50vh;
+    /* height: 50vh; */
     border: 5px solid aqua;
 }
 
 #tool-options {
-    height: 40vh;
+    /* height: 40vh; */
     border: 5px solid darkgoldenrod;
 }
 
-/* FOR GRID */
+.commands, .shapes, .tools {
+    margin: 10px 0;
+    padding: 10px 15px;
+    border: 5px dashed darkorange
+}
+
+.flexitem {
+    width: 35%;
+    padding: 5px;
+    margin: 5px;
+    border: 2px solid black;
+    text-align: center;
+}
+
+.flexitem:hover {
+    background-color: orange;
+    cursor: pointer;
+}
+
+.selected {
+    background-color: orange;
+}
 
 .grid {
     display: grid;
