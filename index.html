@@ -97,44 +97,41 @@
                   <button title="darken" data-brush="darken" id="darken">darken</button>
                   <button title="lighten" data-brush="lighten" id="lighten">Lighten</button>
                   <button title="difference" data-brush="difference" id="difference">difference</button>
-                </div>
-
-                <div class="row" id="tool-options">Tool Options
-
                   <button id="undo">undo</button>
                   <button id="redo">redo</button>
-
-                  <div id="stroke-options" class="d-flex flex-column">
-                    
-                    <div id="stroke-color-options">
-                      <label for="stroke-color" style="width: 100px">Brush Color</label>
-                      <input type="color" id="stroke-color-input">
-                    </div>
-                    
-
-                    <div id="stroke-size-options">
-                      <label for="stroke-size">Brush Size</label><br>
-                      <input type="range" min="1" max="100" value="5" style="width: 100px" name="stroke-size"id="stroke-size-slider">
-                      <input type="number" min="0" max="75" value="5" onClick="this.select();" style="width: 50px" id="stroke-size-input">
-                      <span>px</span>
-                    </div>
-
-                    <div id="opacity-options">
-                      <label for="opacity">Opacity</label><br>
-                      <input type="range" min="0" max="100" value="100" style="width: 100px" name="opacity"id="opacity-slider">
-                      <input type="number" min="0" max="100" value="100" onClick="this.select();" style="width: 50px" id="opacity-input">
-                      <span>%</span>
-                    </div>
-
-                  </div>
-
                 </div>
+                <div class="row" id="tool-options"></div>
+
+              </div>
+              <div class="col-md-10 columns grid">
+                <canvas width="700" height="500" class="canvas bg" id="background-canvas"></canvas>
+                <canvas width="700" height="500" class="canvas first" id="drawing-canvas"></canvas>
+              </div>
             </div>
-            <div class="col-md-10 columns grid">
-              <canvas width="700" height="500" class="canvas bg" id="background-canvas"></canvas>
-              <canvas width="700" height="500" class="canvas first" id="drawing-canvas"></canvas>
-            </div>
-        </div>
+          </div>
+
+  <div id="brush-options">
+    <h5>Brush Options</h5>
+    <hr>
+    <div id="stroke-options" class="d-flex flex-column">
+      <div id="stroke-color-options">
+        <label for="stroke-color" style="width: 100px">Brush Color</label>
+        <input type="color" id="stroke-color-input">
+      </div>
+      <div id="stroke-size-options">
+        <label for="stroke-size">Brush Size</label><br>
+        <input type="range" min="1" max="100" value="5" style="width: 100px" name="stroke-size"id="stroke-size-slider">
+        <input type="number" min="0" max="75" value="5" onClick="this.select();" style="width: 50px" id="stroke-size-input">
+        <span>px</span>
+      </div>
+      <div id="opacity-options">
+        <label for="opacity">Opacity</label><br>
+        <input type="range" min="0" max="100" value="100" style="width: 100px" name="opacity"id="stroke-opacity-slider">
+        <input type="number" min="0" max="100" value="100" onClick="this.select();" style="width: 50px" id="stroke-opacity-input">
+        <span>%</span>
+      </div>
     </div>
+  </div>
+
 </body>
 </html>
