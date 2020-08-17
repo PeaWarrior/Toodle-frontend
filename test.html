@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snap-Paint</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <link rel="stylesheet" href="./normalize.css">
+    <!-- <link rel="stylesheet" href="./normalize.css"> -->
     <link href="./css/all.css" rel="stylesheet">
     <link rel="stylesheet" href="./test.css">
     
@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 
-    <script defer src="index.js"></script>
+    <script defer src="test.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -55,48 +55,79 @@
 
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-2 columns">
-                <div class="row" id="tools">
+            <div class="col-md-2 columns sidebar-left">
+                <div class="row d-flex justify-content-center" id="tools">
                     <div class="d-flex flex-column">
                         <div class="commands d-flex flex-wrap justify-content-around">
-                            <div class="flexitem selected"><i class="fas fa-paint-brush" data-tool="brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
+                            <div class="flexitem" data-command="new" title="new"><i class="fas fa-plus"></i></div>
+                            <div class="flexitem" data-command="clear" title="clear"><i class="fas fa-trash"></i></div>
+                            <div class="flexitem" data-command="save" title="save"><i class="fas fa-save"></i></div>
+                            <div class="flexitem" data-command="download" title="download"><i class="fas fa-download"></i></div>
+                            <div class="flexitem" data-command="undo" title="undo"><i class="fas fa-undo"></i></div>
+                            <div class="flexitem" data-command="redo" title="redo"><i class="fas fa-redo"></i></i></div>
+                            <!-- <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
+                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div> -->
                         </div>
 
                         <div class="shapes d-flex flex-wrap justify-content-around">
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
+                            <div class="flexitem activetool" data-tool="line" title="line"><i class="fas fa-minus"></i></div>
+                            <div class="flexitem" data-tool="rectangle" title="rectangle"><i class="fas fa-square"></i></div>
+                            <div class="flexitem" data-tool="circle" title="circle"><i class="fas fa-circle"></i></div>
+                            <!-- <div class="flexitem" data-tool="triangle" title="triangle"><i class="fas fa-caret-up"></i></div> -->
+                            <div class="flexitem" data-tool="triangle" title="triangle"><img src="images/triangle.png"></div>
                         </div>
 
                         <div class="tools d-flex flex-wrap justify-content-around">
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
+                            <div class="flexitem" data-tool="brush" title="brush"><i class="fas fa-paint-brush"></i></div>
+                            <div class="flexitem" data-tool="eraser" title="eraser"><i class="fas fa-eraser"></i></div>
+                            <div class="flexitem" data-tool="bucket" title="paint bucket"><i class="fas fa-fill-drip"></i></div>
+                            <div class="flexitem" data-tool="text" title="text"><i class="fas fa-font"></i></div>
+                        </div>
+
+                        <div class="tools d-flex flex-wrap justify-content-around">
+                            <div id="stroke-color-options" class="color-picker">
+                                <input type="color" id="stroke-color-input">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row" id="tool-options">
-
+                <div class="row d-flex justify-content-center" id="tool-options">
+                    <div id="stroke-options" class="d-flex flex-column align-items-between">
+                        <div id="stroke-blend-options" class="stroke-options">
+                            <label for="stroke-size">Blend</label><br>
+                            <select>
+                                <option value="source-over">Normal</option>
+                                <option value="multiply">Multiply</option>
+                                <option value="screen">Screen</option>
+                                <option value="lighten">Lighten</option>
+                                <option value="darken">Darken</option>
+                                <option value="difference">Difference</option>
+                            </select>
+                        </div>
+                        <div id="stroke-size-options" class="stroke-options">
+                          <label for="stroke-size">Size</label><br>
+                          <input type="range" min="1" max="100" value="5" style="width: 100px" name="stroke-size"id="stroke-size-slider">
+                          <input type="number" min="0" max="75" value="5" onClick="this.select();" style="width: 50px" id="stroke-size-input">
+                          <span>px</span>
+                        </div>
+                        <div id="opacity-options" class="stroke-options">
+                          <label for="opacity">Opacity</label><br>
+                          <input type="range" min="0" max="100" value="100" style="width: 100px" name="opacity"id="stroke-opacity-slider">
+                          <input type="number" min="0" max="100" value="100" onClick="this.select();" style="width: 50px" id="stroke-opacity-input">
+                          <span>%</span>
+                        </div>
+                    </div>
                 </div>
 
               </div>
-              <div class="col-md-10 columns grid">
-                <canvas width="700" height="500" class="canvas bg" id="background-canvas"></canvas>
-                <canvas width="700" height="500" class="canvas first" id="drawing-canvas"></canvas>
+              <div class="col-md-10 columns">
+                <div class="canvas-container grid">
+                    <!-- <canvas width="700" height="500" class="canvas bg" id="background-canvas"></canvas> -->
+                    <canvas width="700" height="500" class="canvas first" id="drawing-canvas"></canvas>
+                </div>
               </div>
             </div>
-          </div>
-
-          
+        </div>
         </body>
 </html>

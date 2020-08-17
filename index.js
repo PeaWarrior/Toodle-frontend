@@ -312,4 +312,3 @@ function hexToRGB(hex) {
 //     const imageDisplay = document.querySelector('div#image-display')
 //     imageDisplay.append(img)
 // }
-
