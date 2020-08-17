@@ -29,17 +29,11 @@ html, body {
     display: grid;
     grid-template-columns: auto;
     padding: 25px;
-    /* max-width: 1200px;
-    min-width: 700px; */
 }
 
 .canvas {
     grid-column: 1;
     grid-row: 1;
-    /* width: 100% */
-    /* position:fixed;
-    left: 100;
-    top: 100; */
 }
 
 .bg {
@@ -49,4 +43,8 @@ html, body {
 .first {
     border: 1px solid green;
     z-index: 1;
+}
+
+.selected {
+    border: 2px red solid
 }

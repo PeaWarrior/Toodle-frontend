@@ -88,14 +88,15 @@
             <div class="col-md-2 columns">
                 <div class="row" id="tools">
 
+                  <button title="brush" id="brush">Brush</button>
                   <button title="clear" id="clear">clear</button>
-                  <button title="normal" id="normal">Normal</button>
-                  <button title="erase" id="erase">Erase</button>
-                  <button title="multiply" id="multiply">Multiply</button>
-                  <button title="screen" id="screen">Screen</button>
-                  <button title="darken" id="darken">darken</button>
-                  <button title="lighten" id="lighten">Lighten</button>
-                  <button title="difference" id="difference">difference</button>
+                  <button title="normal" data-brush="source-over" id="normal">Normal</button>
+                  <button title="erase" data-brush="destination-out" id="erase">Erase</button>
+                  <button title="multiply" data-brush="multiply" id="multiply">Multiply</button>
+                  <button title="screen" data-brush="screen" id="screen">Screen</button>
+                  <button title="darken" data-brush="darken" id="darken">darken</button>
+                  <button title="lighten" data-brush="lighten" id="lighten">Lighten</button>
+                  <button title="difference" data-brush="difference" id="difference">difference</button>
                 </div>
 
                 <div class="row" id="tool-options">Tool Options
@@ -130,7 +131,8 @@
                 </div>
             </div>
             <div class="col-md-10 columns grid">
-              
+              <canvas width="700" height="500" class="canvas bg" id="background-canvas"></canvas>
+              <canvas width="700" height="500" class="canvas first" id="drawing-canvas"></canvas>
             </div>
         </div>
     </div>
