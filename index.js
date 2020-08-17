@@ -168,6 +168,15 @@ function btnHandler() {
     currentBrush = this.dataset.brush
 }
 
+// clearBtn
+const clearBtn = document.querySelector('button#clear')
+clearBtn.addEventListener('click', clearCanvasHandler)
+
+function clearCanvasHandler() {
+    ctx.clearRect(0, 0, 700, 500)
+    createNewCanvasState()
+}
+
 // stroke color changer
 const strokeColorInput = document.querySelector('input#stroke-color-input')
 strokeColorInput.addEventListener('input', changeStrokeColor);
