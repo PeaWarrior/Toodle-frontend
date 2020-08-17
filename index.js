@@ -2,7 +2,7 @@ const DOM = {
     canvas: document.querySelector('canvas#drawing-canvas'),
     toolBar: document.querySelector('div#tools'),
     toolOptions: document.querySelector('div#tool-options'),
-    brushOptions: document.querySelector('div#brush-options'),
+    brushOptions: document.querySelector('template#brush-options'),
     buttons: {
         brush: document.querySelector('button#brush'),
         undo: document.querySelector('button#undo'),
@@ -57,7 +57,7 @@ DOM.buttons.brush.addEventListener('click', brushOptionsHandler)
 
 function brushOptionsHandler() {
     clearToolOptions()
-    let brushOptions = DOM.brushOptions.cloneNode(true)
+    let brushOptions = DOM.brushOptions.content.cloneNode(true)
     let strokeColorInput = brushOptions.querySelector('input#stroke-color-input')
         strokeColorInput.value = stroke.rgb
     let strokeSizeInput = brushOptions.querySelector('input#stroke-size-input')
