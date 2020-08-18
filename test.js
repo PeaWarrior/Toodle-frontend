@@ -4,6 +4,7 @@ const DOM = {
   redoButton: document.querySelector('div[data-command="redo"]'),
   clearButton: document.querySelector('div[data-command="clear"]'),
   eraserButton: document.querySelector('div[data-command="eraser"]'),
+  colorPicker: document.querySelector('input#stroke-color-input'),
 }
 
 const ctx = DOM.canvas.getContext('2d');
@@ -47,6 +48,7 @@ document.querySelectorAll("[data-tool]").forEach(item => {
 // EVENT FUNCTIONS
 function init() {
   DOM.canvas.onmousedown = e => onMouseDown(e);
+  DOM.colorPicker.addEventListener('input', changeStrokeColor)
 }
 
 function onMouseDown(e) {
@@ -91,7 +93,10 @@ function onMouseUp(e) {
   STATE.undo.push(savedData)
   DOM.canvas.onmousemove = null;
   document.onmouseup = null;
+}
 
+function changeStrokeColor() {
+  ctx.strokeStyle = `rgba(${hexToRGB(this.value)})`
 }
 
 // DRAW FUNCTIONS
