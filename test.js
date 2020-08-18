@@ -1,6 +1,9 @@
 const DOM = {
+  canvasContainer: document.querySelector('div.canvas-container'),
   canvas: document.querySelector('canvas#drawing-canvas'),
+  newButton: document.querySelector('div[data-command="new"]'),
   downloadButton: document.querySelector('div[data-command="download"]'),
+  saveButton: document.querySelector('div[data-command="save"]'),
   clearButton: document.querySelector('div[data-command="clear"]'),
   undoButton: document.querySelector('div[data-command="undo"]'),
   redoButton: document.querySelector('div[data-command="redo"]'),
@@ -8,7 +11,11 @@ const DOM = {
   colorPicker: document.querySelector('input#stroke-color-input'),
 }
 
-const ctx = DOM.canvas.getContext('2d');
+const TEMPLATE = {
+  canvas: document.querySelector('template#canvas-template'),
+}
+
+let ctx
 
 const TOOLS = {
   line: 'line',
@@ -32,12 +39,12 @@ const currentPos = {x: 0, y: 0};
 
 let points = [];
 
-let savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
+let savedData
 
 STATE.activeTool = TOOLS.brush;
 
 // RUN
-init();
+// init();
 document.querySelectorAll("[data-tool]").forEach(item => {
   item.addEventListener('click', e => {
       document.querySelector("[data-tool].activetool").classList.toggle("activetool");
@@ -185,17 +192,46 @@ function getRadius(coord1, coord2) {
   return Math.sqrt(xPow + yPow);
 }
 
+function createNewCanvasElement() {
+  if (!!DOM.canvas) {
+    DOM.canvas.remove()
+  }
+  let newCanvas = TEMPLATE.canvas.content.cloneNode(true).querySelector('canvas')
+  DOM.canvas = newCanvas
+  ctx = DOM.canvas.getContext('2d')
+  init()
+}
+
+function clearCanvasStates() {
+  STATE.undo.length = 0
+  STATE.redo.length = 0
+}
+
 // COMMAND EVENTS
+DOM.newButton.addEventListener('click', newCanvas)
 DOM.downloadButton.addEventListener('click', downloadCanvas)
 DOM.clearButton.addEventListener('click', clearCanvas)
 DOM.undoButton.addEventListener('click', undoCanvas)
 DOM.redoButton.addEventListener('click', redoCanvas)
 
 // COMMAND FUNCTIONS
+function newCanvas() {
+  createNewCanvasElement()
+  DOM.canvasContainer.append(DOM.canvas)
+  clearCanvasStates()
+}
+
 function clearCanvas() {
   ctx.clearRect(0, 0, 700, 500)
   savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
   STATE.undo.push(savedData)
+}
+
+function downloadCanvas() {
+  let tempLink = document.createElement('a')
+  tempLink.href = DOM.canvas.toDataURL()
+  tempLink.download = ''
+  tempLink.click()
 }
 
 function undoCanvas() {
@@ -210,11 +246,4 @@ function redoCanvas() {
     ctx.putImageData(STATE.redo[STATE.redo.length-1], 0, 0)
     STATE.undo.push(STATE.redo.pop())
   }
-}
-
-function downloadCanvas() {
-  let tempLink = document.createElement('a')
-  tempLink.href = DOM.canvas.toDataURL()
-  tempLink.download = ''
-  tempLink.click()
 }
