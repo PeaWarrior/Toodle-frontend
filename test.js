@@ -193,10 +193,8 @@ function getRadius(coord1, coord2) {
 }
 
 function createNewCanvasFromTemplate() {
-  if (!!DOM.canvas) {
-    if (confirm('Your will lose all unsaved work.')) {
+  if (!!DOM.canvas && confirm('Your will lose all unsaved work.')) {
       DOM.canvas.remove()
-    }
   }
   let newCanvas = TEMPLATE.canvas.content.cloneNode(true).querySelector('canvas')
   DOM.canvas = newCanvas
