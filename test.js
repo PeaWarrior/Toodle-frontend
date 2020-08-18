@@ -3,6 +3,7 @@ const DOM = {
   undoButton: document.querySelector('div[data-command="undo"]'),
   redoButton: document.querySelector('div[data-command="redo"]'),
   clearButton: document.querySelector('div[data-command="clear"]'),
+  eraserButton: document.querySelector('div[data-command="eraser"]'),
 }
 
 const ctx = DOM.canvas.getContext('2d');
@@ -13,6 +14,7 @@ const TOOLS = {
   circle: 'circle',
   triangle: 'triangle',
   brush: 'brush',
+  eraser: 'eraser',
 }
 
 const STATE = {
@@ -75,6 +77,9 @@ function onMouseMove(e) {
     case TOOLS.brush:
       drawFreeLine();
       break;
+    case TOOLS.eraser:
+      erase();
+      break;
     default:
       break;
   }
@@ -136,6 +141,12 @@ function drawFreeLine() {
   ctx.stroke()
 }
 
+function erase() {
+  ctx.globalCompositeOperation = 'destination-out'
+  drawFreeLine()
+  ctx.globalCompositeOperation = 'source-over'
+}
+
 // UTILITY FUNCTIONS
 function getMouseCoordsOnCanvas(e, canvas) {
   // let rect = canvas.getBoundingClientRect();
@@ -171,8 +182,10 @@ DOM.clearButton.addEventListener('click', clearCanvas)
 
 // COMMAND FUNCTIONS
 function undoCanvas() {
-  ctx.putImageData(STATE.undo[STATE.undo.length-2], 0, 0)
-  STATE.redo.push(STATE.undo.pop())
+  if (STATE.undo.length > 1) {
+    ctx.putImageData(STATE.undo[STATE.undo.length-2], 0, 0)
+    STATE.redo.push(STATE.undo.pop())
+  }
 }
 
 function redoCanvas() {
