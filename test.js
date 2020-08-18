@@ -1,8 +1,9 @@
 const DOM = {
   canvas: document.querySelector('canvas#drawing-canvas'),
+  downloadButton: document.querySelector('div[data-command="download"]'),
+  clearButton: document.querySelector('div[data-command="clear"]'),
   undoButton: document.querySelector('div[data-command="undo"]'),
   redoButton: document.querySelector('div[data-command="redo"]'),
-  clearButton: document.querySelector('div[data-command="clear"]'),
   eraserButton: document.querySelector('div[data-command="eraser"]'),
   colorPicker: document.querySelector('input#stroke-color-input'),
 }
@@ -181,11 +182,18 @@ function getRadius(coord1, coord2) {
 }
 
 // COMMAND EVENTS
+DOM.downloadButton.addEventListener('click', downloadCanvas)
+DOM.clearButton.addEventListener('click', clearCanvas)
 DOM.undoButton.addEventListener('click', undoCanvas)
 DOM.redoButton.addEventListener('click', redoCanvas)
-DOM.clearButton.addEventListener('click', clearCanvas)
 
 // COMMAND FUNCTIONS
+function clearCanvas() {
+  ctx.clearRect(0, 0, 700, 500)
+  savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
+  STATE.undo.push(savedData)
+}
+
 function undoCanvas() {
   if (STATE.undo.length > 1) {
     ctx.putImageData(STATE.undo[STATE.undo.length-2], 0, 0)
@@ -200,8 +208,9 @@ function redoCanvas() {
   }
 }
 
-function clearCanvas() {
-  ctx.clearRect(0, 0, 700, 500)
-  savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
-  STATE.undo.push(savedData)
+function downloadCanvas() {
+  let tempLink = document.createElement('a')
+  tempLink.href = DOM.canvas.toDataURL()
+  tempLink.download = ''
+  tempLink.click()
 }
