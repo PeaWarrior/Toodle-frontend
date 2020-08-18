@@ -24,9 +24,9 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item active">
-              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+              <a id="my-doodles" class="nav-link" href="#">My Doodles <span class="sr-only">(current)</span></a>
             </li>
-            <li class="nav-item">
+            <!--  <li class="nav-item">
               <a class="nav-link" href="#">Features</a>
             </li>
             <li class="nav-item">
@@ -34,8 +34,13 @@
             </li>
             <li class="nav-item">
               <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-            </li>
+            </li> -->
           </ul>
+          <div class="d-flex justify-content-center" style="width: 70%;">
+            <span id="image-title" class="navbar-text">
+              
+            </span>
+          </div>
         </div>
 
         <div id="account-options">
@@ -122,10 +127,33 @@
 
               </div>
               <div class="col-md-10 columns">
+                <div id="form-div">
+                  <form id="form">
+                    <div class="form-group">
+                      <label for="username">User Name</label>
+                      <input type="text" class="form-control" id="username">
+                    </div>
+                    <div class="form-group">
+                      <label for="password">Password</label>
+                      <input type="password" class="form-control" id="password">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="form-submit" value="signup">Login</button>
+                  </form>
+                  <!-- <div id="form-error">
+                    <p>wrong username or password</p>
+                  </div> -->
+                </div>
+                <div id="images" class="elements-container d-flex flex-wrap">
+                  <!-- <figure>
+                    <img src="file:///Users/alvee/Downloads/pic1.png">
+                    <figcaption>Image Title</figcaption>
+                  </figure> -->
+                </div>
                 <div class="canvas-container grid">
-                    <template id="canvas-template">
+                    <canvas width="700" height="500" class="canvas first" id="drawing-canvas"></canvas>
+                    <!-- <template id="canvas-template">
                       <canvas width="700" height="500" class="canvas first" id="drawing-canvas"></canvas>
-                    </template>
+                    </template> -->
                 </div>
               </div>
             </div>

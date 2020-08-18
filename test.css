@@ -6,13 +6,18 @@ html, body {
     margin:0;
 }
 
+nav {
+    font-size: 1.3rem;
+    border-bottom: 2px solid yellowgreen;
+}
+
 .columns {
     height: 90vh;
-    border: 2px solid black;
 }
 
 .sidebar-left {
     background-color: beige;
+    border: 2px solid black;
 }
 
 #tools {
@@ -74,6 +79,39 @@ input#stroke-color-input:hover {
 
 .canvas-container {
     padding: 10px;
+}
+
+.elements-container figure {
+    cursor: pointer;
+}
+
+.elements-container figcaption {
+    text-align: center;
+}
+
+.elements-container img {
+    width: 250px;
+    margin: 10px;
+    border: 5px solid darkblue;
+}
+
+#image-title {
+    color: #000;
+    font-family: 'menlo';
+}
+
+div#login {
+    padding: 20px;
+}
+
+div#form-error {
+    margin: 20px 0;
+    padding: 0 30px;
+    width: 100%;
+    font-size: 1.4rem;
+    background-color: pink;
+    font-style: bold;
+    color: red;
 }
 
 /* .grid {

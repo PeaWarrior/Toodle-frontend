@@ -1,6 +1,11 @@
 const DOM = {
   canvasContainer: document.querySelector('div.canvas-container'),
   canvas: document.querySelector('canvas#drawing-canvas'),
+  images: document.querySelector('#images'),
+  imageTitle: document.querySelector('#image-title'),
+  myDoodle: document.querySelector('#my-doodles'),
+  form: document.querySelector('#form'),
+  formButton: document.querySelector('#form-submit'),
   newButton: document.querySelector('div[data-command="new"]'),
   downloadButton: document.querySelector('div[data-command="download"]'),
   saveButton: document.querySelector('div[data-command="save"]'),
@@ -15,7 +20,10 @@ const TEMPLATE = {
   canvas: document.querySelector('template#canvas-template'),
 }
 
-let ctx
+const baseURL = "http://localhost:3000";
+
+let ctx = DOM.canvas.getContext('2d');
+toggleCanvasHidden();
 
 const TOOLS = {
   line: 'line',
@@ -32,6 +40,8 @@ const STATE = {
   redo: [],
   startPos: {x: 0, y: 0},
   currentPos: {x: 0, y: 0},
+  userID: 1,
+  imageTitle: "",
 }
 
 const startPos = {x: 0, y: 0};
@@ -39,12 +49,13 @@ const currentPos = {x: 0, y: 0};
 
 let points = [];
 
-let savedData
+let savedData;
 
 STATE.activeTool = TOOLS.brush;
 
 // RUN
-// init();
+init();
+
 document.querySelectorAll("[data-tool]").forEach(item => {
   item.addEventListener('click', e => {
       document.querySelector("[data-tool].activetool").classList.toggle("activetool");
@@ -52,6 +63,96 @@ document.querySelectorAll("[data-tool]").forEach(item => {
       STATE.activeTool = document.querySelector("[data-tool].activetool").dataset["tool"];
   })
 })
+
+DOM.myDoodle.addEventListener('click', myDoodleFunc);
+
+DOM.form.addEventListener('submit', authenticate);
+
+function authenticate(e) {
+  e.preventDefault();
+  const form = DOM.form;
+  const username = form['username'].value;
+  const password = form['password'].value
+
+  const submitValue = DOM.formButton.value;
+
+  if (submitValue == "login") {
+    login(username, password);
+  } else {
+    signup(username, password);
+  }
+
+  form.reset();
+}
+
+function signup(username, password) {
+  const postConfig = {
+    method: "POST",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      user: {
+        username: username,
+        password: password
+      }
+    })
+  }
+
+  fetch('http://localhost:3000/signup', postConfig)
+    .then(res => res.json())
+    .then(user => console.log(user))
+    .catch(err => console.log(err));
+}
+
+function login(username, password) {
+  const postConfig = {
+    method: "POST",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      user: {
+        username: username,
+        password: password
+      }
+    })
+  }
+
+  fetch('http://localhost:3000/login', postConfig)
+    .then(res => res.json())
+    .then(user => STATE.userID = user.id)
+    .catch(err => console.log(err));
+}
+
+// UI FUNCTIONS
+function myDoodleFunc(e) {
+  userResponse = confirm("WILL DESTROY EVERYTHING!!!")
+  if (userResponse) {
+    STATE.imageTitle = "";
+    DOM.imageTitle.textContent = STATE.imageTitle;
+    // HIDE CANVAS
+    clearCanvas();
+    toggleCanvasHidden();
+    fetchAndShowUserWorks();
+  } else {
+    console.log("lol got scared for a sec...");
+  }
+}
+
+function fetchAndShowUserWorks() {
+  fetch(`http://localhost:3000/users/${STATE.userID}`)
+    .then(res => res.json())
+    .then(user => {
+      DOM.images.innerHTML = "";
+      user.images.forEach(image => displayArt(image));
+    });
+}
+
+function displayArt(image) {
+  const figureElement = createFigureElement(image);
+  DOM.images.append(figureElement);
+}
 
 // EVENT FUNCTIONS
 function init() {
@@ -207,6 +308,15 @@ function clearCanvasStates() {
   STATE.redo.length = 0
 }
 
+function promptAndSetImageTitle() {
+  STATE.imageTitle = prompt("Please enter a title (PG-13)");
+  DOM.imageTitle.textContent = STATE.imageTitle || "Untitled";
+}
+
+function toggleCanvasHidden() {
+  DOM.canvasContainer.hidden = !DOM.canvasContainer.hidden;
+}
+
 // COMMAND EVENTS
 DOM.newButton.addEventListener('click', newCanvas)
 DOM.downloadButton.addEventListener('click', downloadCanvas)
@@ -216,9 +326,11 @@ DOM.redoButton.addEventListener('click', redoCanvas)
 
 // COMMAND FUNCTIONS
 function newCanvas() {
-  createNewCanvasFromTemplate()
-  DOM.canvasContainer.append(DOM.canvas)
-  clearCanvasStates()
+  // createNewCanvasFromTemplate()
+  promptAndSetImageTitle();
+  // DOM.canvasContainer.append(DOM.canvas);
+  clearCanvasStates();
+  toggleCanvasHidden();
 }
 
 function clearCanvas() {
@@ -246,4 +358,15 @@ function redoCanvas() {
     ctx.putImageData(STATE.redo[STATE.redo.length-1], 0, 0)
     STATE.undo.push(STATE.redo.pop())
   }
+}
+
+// CREATE DOM ELEMENTS FUNCTIONS
+function createFigureElement(image) {
+  const figure = document.createElement('figure');
+  const img = document.createElement('img');
+    img.src = `${baseURL}${image.art.url}`
+  const figcaption = document.createElement('figcaption');
+    figcaption.textContent = `${image.title}`;
+  figure.append(img, figcaption);
+  return figure;
 }
