@@ -1,5 +1,7 @@
 const DOM = {
   canvas: document.querySelector('canvas#drawing-canvas'),
+  undoButton: document.querySelector('div[data-command="undo"]'),
+  redoButton: document.querySelector('div[data-command="redo"]'),
 }
 
 const ctx = DOM.canvas.getContext('2d');
@@ -46,7 +48,9 @@ function init() {
 
 function onMouseDown(e) {
   savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
-  STATE.undo.push(savedData)
+  if (STATE.undo.length === 0) {
+    STATE.undo.push(savedData)
+  }
   DOM.canvas.onmousemove = e => onMouseMove(e);
   document.onmouseup = e => onMouseUp(e);
   coords = getMouseCoordsOnCanvas(e);
@@ -77,6 +81,8 @@ function onMouseMove(e) {
 
 function onMouseUp(e) {
   points = []
+  savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
+  STATE.undo.push(savedData)
   DOM.canvas.onmousemove = null;
   document.onmouseup = null;
 
@@ -108,7 +114,7 @@ function drawShape() {
 }
 
 function drawFreeLine() {
-  ctx.globalCompositeOperation = 'source-over'
+  // ctx.globalCompositeOperation = 'source-over'
   STATE.redo = []
   if (points.length < 6) {
       let firstPoint = points[0];
@@ -155,4 +161,21 @@ function getRadius(coord1, coord2) {
   const xPow = Math.pow(coord2.x - coord1.x, 2);
   const yPow = Math.pow(coord2.y - coord1.y, 2);
   return Math.sqrt(xPow + yPow);
+}
+
+// COMMAND FUNCTIONS
+DOM.undoButton.addEventListener('click', undoCanvas)
+
+function undoCanvas() {
+  ctx.putImageData(STATE.undo[STATE.undo.length-2], 0, 0)
+  STATE.redo.push(STATE.undo.pop())
+}
+
+DOM.redoButton.addEventListener('click', redoCanvas)
+
+function redoCanvas() {
+  if (STATE.redo.length) {
+    ctx.putImageData(STATE.redo[STATE.redo.length-1], 0, 0)
+    STATE.undo.push(STATE.redo.pop())
+  }
 }
