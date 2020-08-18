@@ -2,6 +2,7 @@ const DOM = {
   canvas: document.querySelector('canvas#drawing-canvas'),
   undoButton: document.querySelector('div[data-command="undo"]'),
   redoButton: document.querySelector('div[data-command="redo"]'),
+  clearButton: document.querySelector('div[data-command="clear"]'),
 }
 
 const ctx = DOM.canvas.getContext('2d');
@@ -163,19 +164,26 @@ function getRadius(coord1, coord2) {
   return Math.sqrt(xPow + yPow);
 }
 
-// COMMAND FUNCTIONS
+// COMMAND EVENTS
 DOM.undoButton.addEventListener('click', undoCanvas)
+DOM.redoButton.addEventListener('click', redoCanvas)
+DOM.clearButton.addEventListener('click', clearCanvas)
 
+// COMMAND FUNCTIONS
 function undoCanvas() {
   ctx.putImageData(STATE.undo[STATE.undo.length-2], 0, 0)
   STATE.redo.push(STATE.undo.pop())
 }
-
-DOM.redoButton.addEventListener('click', redoCanvas)
 
 function redoCanvas() {
   if (STATE.redo.length) {
     ctx.putImageData(STATE.redo[STATE.redo.length-1], 0, 0)
     STATE.undo.push(STATE.redo.pop())
   }
+}
+
+function clearCanvas() {
+  ctx.clearRect(0, 0, 700, 500)
+  savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
+  STATE.undo.push(savedData)
 }
