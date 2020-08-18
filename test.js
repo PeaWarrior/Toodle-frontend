@@ -62,6 +62,10 @@ function onMouseDown(e) {
   coords = getMouseCoordsOnCanvas(e);
   startPos.x = e.offsetX;
   startPos.y = e.offsetY;
+  if (STATE.activeTool === TOOLS.brush) {
+    points.push(coords)
+    drawFreeLine()
+  }
 }
 
 function onMouseMove(e) {
