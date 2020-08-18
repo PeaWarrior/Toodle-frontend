@@ -9,7 +9,6 @@ const TOOLS = {
   rectangle: 'rectangle',
   circle: 'circle',
   triangle: 'triangle',
-  pencil: 'pencil',
   brush: 'brush',
 }
 
@@ -25,11 +24,10 @@ const startPos = {x: 0, y: 0};
 const currentPos = {x: 0, y: 0};
 
 let points = [];
-let toggleDraw
 
 let savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
 
-STATE.activeTool = TOOLS.pencil;
+STATE.activeTool = TOOLS.brush;
 
 // RUN
 init();
@@ -69,7 +67,7 @@ function onMouseMove(e) {
     case TOOLS.triangle:
       drawShape();
       break;
-    case TOOLS.pencil:
+    case TOOLS.brush:
       drawFreeLine();
       break;
     default:
