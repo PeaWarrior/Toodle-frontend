@@ -24,6 +24,9 @@ const STATE = {
 const startPos = {x: 0, y: 0};
 const currentPos = {x: 0, y: 0};
 
+let points = [];
+let toggleDraw
+
 let savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
 
 STATE.activeTool = TOOLS.pencil;
@@ -45,22 +48,19 @@ function init() {
 
 function onMouseDown(e) {
   savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
+  STATE.undo.push(savedData)
   DOM.canvas.onmousemove = e => onMouseMove(e);
   document.onmouseup = e => onMouseUp(e);
-
   coords = getMouseCoordsOnCanvas(e);
-  startPos.x = coords.x;
-  startPos.y = coords.y;
-
-  if (STATE.activeTool == TOOLS.pencil) {
-    ctx.moveTo(startPos.x, startPos.y);
-  }
+  startPos.x = e.offsetX;
+  startPos.y = e.offsetY;
 }
 
 function onMouseMove(e) {
   coords = getMouseCoordsOnCanvas(e, DOM.canvas);
-  currentPos.x = coords.x;
-  currentPos.y = coords.y;
+  currentPos.x = e.offsetX;
+  currentPos.y = e.offsetY;
+  points.push(coords)
 
   switch(STATE.activeTool) {
     case TOOLS.line:
@@ -78,6 +78,7 @@ function onMouseMove(e) {
 }
 
 function onMouseUp(e) {
+  points = []
   DOM.canvas.onmousemove = null;
   document.onmouseup = null;
 
@@ -109,8 +110,25 @@ function drawShape() {
 }
 
 function drawFreeLine() {
-  ctx.lineTo(currentPos.x, currentPos.y);
-  ctx.stroke();
+  ctx.globalCompositeOperation = 'source-over'
+  STATE.redo = []
+  if (points.length < 6) {
+      let firstPoint = points[0];
+      ctx.beginPath()
+      ctx.arc(firstPoint.x, firstPoint.y, ctx.lineWidth / 2, 0, Math.PI * 2, !0)
+      ctx.closePath()
+      ctx.fill();
+      return
+  }
+  ctx.beginPath()
+  ctx.moveTo(points[0].x, points[0].y)
+  for (i = 1; i < points.length - 2; i++) {
+      let a = (points[i].x + points[i + 1].x)/2,
+          b = (points[i].y + points[i + 1].y)/2
+          ctx.quadraticCurveTo(points[i].x, points[i].y, a, b)
+      }
+  ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i +1].y)
+  ctx.stroke()
 }
 
 // UTILITY FUNCTIONS

@@ -81,14 +81,6 @@ function clearToolOptions() {
     range.selectNodeContents(DOM.toolOptions);
     range.deleteContents();
 }
-
-function mouseDownHandler(e) {
-    toggleDraw = true
-    lastPoint = {x: e.offsetX, y: e.offsetY}
-    points.push(lastPoint)
-    drawPoints(ctx, points)
-}
-
 function setStroke() {
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
@@ -97,21 +89,30 @@ function setStroke() {
     ctx.lineWidth = stroke.size
 }
 
+function mouseDownHandler(e) {
+    toggleDraw = true
+    lastPoint = {x: e.offsetX, y: e.offsetY}
+    points.push(lastPoint)
+    drawPoints(ctx, points)
+}
+
+
 function draw(e) {
     if (toggleDraw) {
         ctx.globalCompositeOperation = 'source-over'
-        setStroke()
+        // setStroke()
         ctx.clearRect(0, 0, 700, 500)
-        canvasStates.redo = []
-        ctx.drawImage(canvasStates.undo[canvasStates.undo.length-1], 0, 0)
+        // canvasStates.redo = []
+        // ctx.drawImage(canvasStates.undo[canvasStates.undo.length-1], 0, 0)
         lastPoint = {x: e.offsetX, y: e.offsetY}
         points.push(lastPoint)
-        ctx.globalCompositeOperation = currentBrush
+        // ctx.globalCompositeOperation = currentBrush
         drawPoints(ctx, points)
     }
 }
 
 function drawPoints(ctx, points) {
+    console.log('click')
     if (points.length < 6) {
         let firstPoint = points[0];
         ctx.beginPath()
