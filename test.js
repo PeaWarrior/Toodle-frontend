@@ -192,9 +192,11 @@ function getRadius(coord1, coord2) {
   return Math.sqrt(xPow + yPow);
 }
 
-function createNewCanvasElement() {
+function createNewCanvasFromTemplate() {
   if (!!DOM.canvas) {
-    DOM.canvas.remove()
+    if (confirm('Your will lose all unsaved work.')) {
+      DOM.canvas.remove()
+    }
   }
   let newCanvas = TEMPLATE.canvas.content.cloneNode(true).querySelector('canvas')
   DOM.canvas = newCanvas
@@ -216,7 +218,7 @@ DOM.redoButton.addEventListener('click', redoCanvas)
 
 // COMMAND FUNCTIONS
 function newCanvas() {
-  createNewCanvasElement()
+  createNewCanvasFromTemplate()
   DOM.canvasContainer.append(DOM.canvas)
   clearCanvasStates()
 }
