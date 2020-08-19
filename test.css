@@ -16,15 +16,26 @@ input::-webkit-inner-spin-button {
 h6 {
     margin-top: 10px;
 }
-
 label {
-    margin: 0.5em 0 0 0;
-    color: #272838;
+    margin: 0;
+    color: #5c80bc;
+}
+
+span {
+    color: #5c80bc;
+}
+
+.select-label {
+    margin: 0.5em 0.5em 0.5em 0;
 }
 
 nav {
-    font-size: 1.3rem;
-    border-bottom: 2px solid yellowgreen;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #5c80bc;
+}
+
+.brand {
+    color: #5c80bc !important;
 }
 
 .authentication-btn {
@@ -43,11 +54,12 @@ nav {
 
 .sidebar-left {
     background-color: #f5f5dc;
-    border: 2px solid black;
+    border-right: 1px solid #5c80bc;
+    border-bottom: 1px solid #5c80bc;
 }
 
 #tools {
-    border-bottom: 5px dashed sandybrown;
+    border-bottom: 1px solid #7e7f9a;
 }
 
 #tool-options {
@@ -57,7 +69,7 @@ nav {
 
 .option-input {
     border: 1px solid #5c80bc;
-    color: #5c80bc;
+    color: #eb9486;
     padding: 0;
     margin: 0 0 5px 0;
     width: 40px;
@@ -70,10 +82,11 @@ nav {
 
 .flexitem {
     width: 30%;
-    padding: 5px;
+    /* height: 40px; */
+    padding: 5px 0;
     margin: 5px;
-    border: 2px solid black;
-    border-radius: 15%;
+    border: 2px solid #7e7f9a;
+    border-radius: 5px;
     text-align: center;
 }
 
@@ -82,12 +95,13 @@ div[data-tool='triangle'] img {
 }
 
 .flexitem:hover {
-    background-color: orange;
+    background-color: #5c80bc;
     cursor: pointer;
 }
 
 .activetool {
-    background-color: orange;
+    background-color: #5c80bc;
+    border: 2px solid #648767;
 }
 
 .color-picker {
@@ -108,16 +122,20 @@ input.color-input:hover {
 }
 
 .select-option {
-    border: 1px solid #EB9486;
+    border: 1px solid #5c80bc;
     width: 8em;
     font-size: small;
     margin: 5px;
     padding: 5px !important;
-    color: #5c80bc;
+    color: #eb9486;
+}
+
+.select-option:hover {
+    color: #eb9486;
 }
 
 .tool-header {
-    color: #af3800;
+    color: #5c80bc;
 }
 
 input[type='range'] {
@@ -140,9 +158,8 @@ input[type='range']::-webkit-slider-thumb {
     width: 10px;
     -webkit-appearance: none;
     height: 20px;
-    cursor: ew-resize;
     background: #eb9486;
-    box-shadow: -80px 0 0 80px #5c80bc;
+    box-shadow: -80px 0 0 78px #5c80bc;
     border-radius: 5px;
 }
 
@@ -174,15 +191,33 @@ div#login {
 }
 
 div#form-error {
-    margin: 20px 0;
-    padding: 0 30px;
-    width: 100%;
-    font-size: 1.4rem;
+    margin: 0 30%;
+    text-align: center;
+    /* width: 100%; */
+    font-size: 1.1rem;
+    border-radius: 5px;
     background-color: pink;
     font-style: bold;
     color: red;
 }
 
 .canvas {
-    border: 1px green solid;
+    border: 1px #5c80bc solid;
+}
+
+form {
+    padding: 5% 5% 0 5%;
+}
+
+.form-group {
+    margin: 2% 40%;
+}
+
+.form-submit-div {
+    text-align: center;
+}
+
+#form-submit {
+    color: #5c80bc;
+    border: 1px solid #5c80bc;
 }
