@@ -88,6 +88,19 @@
 
                   <div class="row d-flex justify-content-center" id="tool-options-container">
                     <div id="tool-options" class="d-flex flex-column align-items-between">
+                      <template id="text-options-template">
+                        <div id="text-options" class="text-options">
+                          <label for="text-input">Text</label><br>
+                          <input type="text" value="" name="text-input" id="text-input">
+                          <label for="text-font-family">Font</label><br>
+                          <select id="text-font-family">
+                            <option value="sans-serif">sans-serif</option>
+                            <option value="sans-serif">sans-serif</option>
+                            <option value="sans-serif">sans-serif</option>
+                          </select>
+                          <input id="text-font-size" type="number" value="12">
+                        </div>
+                      </template>
                       <template id="shape-fill-options-template">
                         <div id="shape-fill-options">
                           <label for="shape-fill">Fill</label><br>
@@ -114,7 +127,7 @@
                       <template id="stroke-size-options-template">
                         <div id="stroke-size-options" class="stroke-options">
                           <label for="stroke-size">Size</label><br>
-                          <input type="range" min="1" max="100" value="5" style="width: 100px" name="stroke-size"id="stroke-size-slider">
+                          <input type="range" min="1" max="100" value="5" style="width: 100px" id="stroke-size-slider">
                           <input type="number" min="0" max="75" value="5" onClick="this.select();" style="width: 50px" id="stroke-size-input">
                           <span>px</span>
                         </div>

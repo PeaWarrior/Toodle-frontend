@@ -24,6 +24,7 @@ const TEMPLATE = {
   strokeSizeOptions: document.querySelector('template#stroke-size-options-template'),
   strokeOpacityOptions: document.querySelector('template#stroke-opacity-options-template'),
   shapeFillOptions: document.querySelector('template#shape-fill-options-template'),
+  textOptions: document.querySelector('template#text-options-template'),
 }
 
 const baseURL = "http://localhost:3000";
@@ -39,6 +40,7 @@ const TOOLS = {
   triangle: 'triangle',
   brush: 'brush',
   eraser: 'eraser',
+  text: 'text',
 }
 
 const STATE = {
@@ -57,6 +59,9 @@ const STATE = {
     opacity: 1,
     shapeFill: 'outline',
   },
+  drawTextInput: "Help Pls",
+  ctxFontSize: "40px",
+  ctxFontFamily: "sans-serif",
 }
 
 const startPos = {x: 0, y: 0};
@@ -90,13 +95,16 @@ function renderOptions() {
     case TOOLS.rectangle:
     case TOOLS.ellipse:
     case TOOLS.triangle:
-      renderShapeOtions();
+      renderShapeOptions();
       break;
     case TOOLS.brush:
       renderBrushOptions();
       break;
     case TOOLS.eraser:
       renderEraserOptions();
+      break;
+    case TOOLS.text:
+      renderTextOptions();
       break;
   }
 }
@@ -213,6 +221,8 @@ function onMouseDown(e) {
     ctx.putImageData(STATE.undo[STATE.undo.length-1], 0, 0)
     points.push(coords)
     drawFreeLine()
+  } else if (STATE.activeTool === TOOLS.text) {
+    drawText();
   }
 }
 
@@ -249,6 +259,14 @@ function onMouseUp(e) {
 }
 
 // DRAW FUNCTIONS
+function drawText() {
+  ctx.font = getCtxText();
+  ctx.putImageData(savedData, 0, 0);
+  ctx.beginPath();
+  ctx.strokeText(STATE.drawTextInput, startPos.x, startPos.y);
+  ctx.closePath();
+}
+
 function drawShape() {
   ctx.putImageData(savedData, 0, 0);
   ctx.beginPath();
@@ -367,6 +385,10 @@ String.prototype.capitalize = function() {
   return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
+function getCtxText() {
+  return `${STATE.ctxFontSize} ${STATE.ctxFontFamily}`;
+}
+
 // COMMAND EVENTS
 DOM.newButton.addEventListener('click', newCanvas)
 DOM.downloadButton.addEventListener('click', downloadCanvas)
@@ -425,7 +447,7 @@ function renderBrushOptions() {
   DOM.toolOptions.append(toolHeader, renderBlendOptions(), renderSizeOptions(), renderOpacityOptions())
 }
 
-function renderShapeOtions() {
+function renderShapeOptions() {
   const toolHeader = document.createElement('h6')
     toolHeader.innerText = `${STATE.activeTool.capitalize()} tool`
   DOM.toolOptions.append(toolHeader, renderShapeFillOptions(), renderBlendOptions(), renderSizeOptions(), renderOpacityOptions())
@@ -473,6 +495,23 @@ function renderShapeFillOptions() {
   return shapeFillOptions
 }
 
+function renderTextOptions() {
+  const toolHeader = document.createElement('h6')
+    toolHeader.innerText = `${STATE.activeTool.capitalize()} tool`
+  const textOptions = TEMPLATE.textOptions.cloneNode(true).content.querySelector('div#text-options')
+  const textInput = textOptions.querySelector('input#text-input')
+    textInput.value = STATE.drawTextInput
+    textInput.addEventListener('input', changeDrawTextInput)
+    debugger
+  const textFontFamily = textOptions.querySelector('select#text-font-family')
+    textFontFamily.value = STATE.ctxFontFamily
+    textFontFamily.addEventListener('input', changeFontFamily)
+  const textFontSize = textOptions.querySelector('input#text-font-size')
+    textFontSize.value = STATE.ctxFontSize
+    textFontFamily.addEventListener('input', changeFontSize)
+  DOM.toolOptions.append(toolHeader, textOptions)
+}
+
 // CHANGE STATE FUNCTIONS
 function changeShapeFill() {
   console.log(this.value)
@@ -506,4 +545,16 @@ function changeStrokeOpacity() {
   this.id === "stroke-opacity-slider" ? this.nextElementSibling.value = this.value : this.previousElementSibling.value = this.value
   STATE.stroke.opacity = this.value/100
   ctx.globalAlpha = STATE.stroke.opacity
+}
+
+function changeDrawTextInput() {
+  STATE.drawTextInput = this.value
+}
+
+function changeFontFamily() {
+  STATE.ctxFontFamily = this.value
+}
+
+function changeFontSize() {
+  STATE.ctxFontSize = this.value
 }
