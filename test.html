@@ -37,11 +37,11 @@
         <div id="account-options">
           <div>
             <!-- modal -->
-            <button type="button" class="btn btn-outline-info mr-2" data-toggle="modal" data-target="#loginModal">
+            <button type="button" class="btn authentication-btn mr-2" data-toggle="modal" data-target="#loginModal">
               Login
             </button>
 
-            <button type="button" class="btn btn-outline-info mr-3" data-toggle="modal" data-target="#loginModal">
+            <button type="button" class="btn authentication-btn mr-3" data-toggle="modal" data-target="#loginModal">
               Sign Up
             </button>
           </div>
@@ -102,19 +102,19 @@
                         </div>
                       </template>
                       <template id="shape-fill-options-template">
-                        <div id="shape-fill-options">
-                          <label for="shape-fill">Fill</label><br>
-                            <select id="shape-fill-select">
-                                <option value="outline">Outline</option>
-                                <option value="fill">Fill</option>
-                                <option value="outlineFill">Outline and fill</option>
-                            </select>
+                        <div id="shape-fill-options" class="d-flex justify-content-between">
+                          <label for="shape-fill">Fill</label>
+                          <select id="shape-fill-select" class="btn select-option">
+                              <option value="outline">Outline</option>
+                              <option value="fill">Fill</option>
+                              <option value="outlineFill">Outline and fill</option>
+                          </select>
                         </div>
                       </template>
                       <template id="blend-options-template">
-                        <div id="stroke-blend-options" class="stroke-options">
-                            <label for="stroke-blend">Blend</label><br>
-                            <select id="stroke-blend-select">
+                        <div id="stroke-blend-options" class=" d-flex justify-content-between">
+                            <label for="stroke-blend">Blend</label>
+                            <select id="stroke-blend-select" class="btn select-option">
                                 <option value="source-over">Normal</option>
                                 <option value="multiply">Multiply</option>
                                 <option value="screen">Screen</option>
@@ -127,16 +127,16 @@
                       <template id="stroke-size-options-template">
                         <div id="stroke-size-options" class="stroke-options">
                           <label for="stroke-size">Size</label><br>
-                          <input type="range" min="1" max="100" value="5" style="width: 100px" id="stroke-size-slider">
-                          <input type="number" min="0" max="75" value="5" onClick="this.select();" style="width: 50px" id="stroke-size-input">
+                          <input type="range" min="1" max="100" value="5" id="stroke-size-slider">
+                          <input type="number" min="0" max="75" value="5" onClick="this.select();" class="btn option-input" id="stroke-size-input">
                           <span>px</span>
                         </div>
                       </template>
                       <template id="stroke-opacity-options-template">
                         <div id="opacity-options" class="stroke-options">
                           <label for="opacity">Opacity</label><br>
-                          <input type="range" min="0" max="100" value="100" style="width: 100px" name="opacity"id="stroke-opacity-slider">
-                          <input type="number" min="0" max="100" value="100" onClick="this.select();" style="width: 50px" id="stroke-opacity-input">
+                          <input type="range" min="0" max="100" value="100" name="opacity"id="stroke-opacity-slider">
+                          <input type="number" min="0" max="100" value="100" onClick="this.select();" class="btn option-input" id="stroke-opacity-input">
                           <span>%</span>
                         </div>
                       </template>

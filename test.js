@@ -19,7 +19,6 @@ const DOM = {
 }
 
 const TEMPLATE = {
-  // brushOptions: document.querySelector('template#brush-options-template'),
   blendOptions: document.querySelector('template#blend-options-template'),
   strokeSizeOptions: document.querySelector('template#stroke-size-options-template'),
   strokeOpacityOptions: document.querySelector('template#stroke-opacity-options-template'),
@@ -442,21 +441,22 @@ function createFigureElement(image) {
 }
 
 function renderBrushOptions() {
-  const toolHeader = document.createElement('h6')
-    toolHeader.innerText = `${STATE.activeTool.capitalize()} tool`
-  DOM.toolOptions.append(toolHeader, renderBlendOptions(), renderSizeOptions(), renderOpacityOptions())
+  DOM.toolOptions.append(renderToolHeader(), renderBlendOptions(), renderSizeOptions(), renderOpacityOptions())
 }
 
 function renderShapeOptions() {
-  const toolHeader = document.createElement('h6')
-    toolHeader.innerText = `${STATE.activeTool.capitalize()} tool`
-  DOM.toolOptions.append(toolHeader, renderShapeFillOptions(), renderBlendOptions(), renderSizeOptions(), renderOpacityOptions())
+  DOM.toolOptions.append(renderToolHeader(), renderBlendOptions(), renderShapeFillOptions(), renderSizeOptions(), renderOpacityOptions())
 }
 
 function renderEraserOptions() {
-  const toolHeader = document.createElement('h6')
+  DOM.toolOptions.append(renderToolHeader(), renderSizeOptions(), renderOpacityOptions())
+}
+
+function renderToolHeader() {
+  const toolHeader = document.createElement('h5')
+    toolHeader.classList = "tool-header"
     toolHeader.innerText = `${STATE.activeTool.capitalize()} tool`
-  DOM.toolOptions.append(toolHeader, renderSizeOptions(), renderOpacityOptions())
+  return toolHeader
 }
 
 function renderBlendOptions() {
@@ -514,7 +514,6 @@ function renderTextOptions() {
 
 // CHANGE STATE FUNCTIONS
 function changeShapeFill() {
-  console.log(this.value)
   STATE.stroke.shapeFill = this.value
 }
 
