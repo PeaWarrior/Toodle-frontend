@@ -50,6 +50,7 @@ const STATE = {
   currentPos: {x: 0, y: 0},
   userID: 1,
   imageTitle: "",
+  canvasID: null,
   stroke: {
     blend: 'source-over',
     brushColor: '0, 0, 0',
@@ -409,9 +410,23 @@ DOM.downloadButton.addEventListener('click', downloadCanvas)
 DOM.clearButton.addEventListener('click', clearCanvas)
 DOM.undoButton.addEventListener('click', undoCanvas)
 DOM.redoButton.addEventListener('click', redoCanvas)
+DOM.saveButton.addEventListener('click', saveCanvas)
 
 // COMMAND FUNCTIONS
+function saveCanvas() {
+    let dataURL = DOM.canvas.toDataURL()
+    let imageObj = {
+        image: {
+            user_id: `${STATE.userID}`,
+            title: "cool",
+            art: dataURL
+        }
+    }
+    !!STATE.canvasID ? updateCanvas(imageObj) : postCanvas(imageObj)
+}
+
 function newCanvas() {
+  STATE.canvasID = null;
   promptAndSetImageTitle();
   clearCanvasStates();
   toggleCanvasHidden();
@@ -448,11 +463,24 @@ function redoCanvas() {
 function createFigureElement(image) {
   const figure = document.createElement('figure');
   const img = document.createElement('img');
+    img.crossOrigin = "Anonymous"
     img.src = `${baseURL}${image.art.url}`
   const figcaption = document.createElement('figcaption');
     figcaption.textContent = `${image.title}`;
   figure.append(img, figcaption);
+
+  img.addEventListener('click', displayImageOnCanvas(image.id))
   return figure;
+}
+
+function displayImageOnCanvas(imageID) {
+  return function() {
+    ctx.drawImage(this, 0, 0)
+    savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
+    STATE.undo.length = 0
+    STATE.undo.push(savedData)
+    STATE.canvasID = imageID
+  }
 }
 
 function renderBrushOptions() {
@@ -572,4 +600,31 @@ function changeFontFamily() {
 
 function changeFontSize() {
   STATE.text.ctxFontSize = this.value
+}
+
+
+// FETCH FUNCTIONS
+
+function updateCanvas(imageObj) {
+  fetch(`http://localhost:3000/images/${STATE.canvasID}`, {
+      method: 'PATCH',
+      headers: {
+          'content-type': 'application/json'
+      },
+      body: JSON.stringify(imageObj)
+  })
+  .then(resp => resp.json())
+  .then(data => console.log(data))
+}
+
+function postCanvas() {
+  fetch(`http://localhost:3000/images/`, {
+      method: 'POST',
+      headers: {
+          'content-type': 'application/json'
+      },
+      body: JSON.stringify(imageObj)
+  })
+  .then(resp => resp.json())
+  .then(data => console.log(data))
 }
