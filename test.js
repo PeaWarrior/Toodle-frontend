@@ -23,7 +23,7 @@ const TEMPLATE = {
 const baseURL = "http://localhost:3000";
 
 let ctx = DOM.canvas.getContext('2d');
-toggleCanvasHidden();
+// toggleCanvasHidden();
 
 const TOOLS = {
   line: 'line',
@@ -32,6 +32,7 @@ const TOOLS = {
   triangle: 'triangle',
   brush: 'brush',
   eraser: 'eraser',
+  text: 'text',
 }
 
 const STATE = {
@@ -42,6 +43,9 @@ const STATE = {
   currentPos: {x: 0, y: 0},
   userID: 1,
   imageTitle: "",
+  drawTextInput: "Help Pls",
+  ctxFontSize: "40px",
+  ctxFontFamily: "sans-serif",
 }
 
 const startPos = {x: 0, y: 0};
@@ -173,6 +177,8 @@ function onMouseDown(e) {
   if (STATE.activeTool === TOOLS.brush) {
     points.push(coords)
     drawFreeLine()
+  } else if (STATE.activeTool === TOOLS.text) {
+    drawText();
   }
 }
 
@@ -213,6 +219,14 @@ function changeStrokeColor() {
 }
 
 // DRAW FUNCTIONS
+function drawText() {
+  ctx.font = getCtxText();
+  ctx.putImageData(savedData, 0, 0);
+  ctx.beginPath();
+  ctx.strokeText(STATE.drawTextInput, startPos.x, startPos.y);
+  ctx.closePath();
+}
+
 function drawShape() {
   ctx.putImageData(savedData, 0, 0);
   ctx.beginPath();
@@ -315,6 +329,10 @@ function promptAndSetImageTitle() {
 
 function toggleCanvasHidden() {
   DOM.canvasContainer.hidden = !DOM.canvasContainer.hidden;
+}
+
+function getCtxText() {
+  return `${STATE.ctxFontSize} ${STATE.ctxFontFamily}`;
 }
 
 // COMMAND EVENTS
