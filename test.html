@@ -26,15 +26,6 @@
             <li class="nav-item active">
               <a id="my-doodles" class="nav-link" href="#">My Doodles <span class="sr-only">(current)</span></a>
             </li>
-            <!--  <li class="nav-item">
-              <a class="nav-link" href="#">Features</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Pricing</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-            </li> -->
           </ul>
           <div class="d-flex justify-content-center" style="width: 70%;">
             <span id="image-title" class="navbar-text">
@@ -61,7 +52,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2 columns sidebar-left">
-                <div class="row d-flex justify-content-center" id="tools">
+              <div class="row d-flex justify-content-center" id="tools">
                     <div class="d-flex flex-column">
                         <div class="commands d-flex flex-wrap justify-content-around">
                             <div class="flexitem" data-command="new" title="new"><i class="fas fa-plus"></i></div>
@@ -70,19 +61,16 @@
                             <div class="flexitem" data-command="download" title="download"><i class="fas fa-download"></i></div>
                             <div class="flexitem" data-command="undo" title="undo"><i class="fas fa-undo"></i></div>
                             <div class="flexitem" data-command="redo" title="redo"><i class="fas fa-redo"></i></i></div>
-                            <!-- <div class="flexitem"><i class="fas fa-paint-brush"></i></div>
-                            <div class="flexitem"><i class="fas fa-paint-brush"></i></div> -->
                         </div>
-
-                        <div class="shapes d-flex flex-wrap justify-content-around">
+                        
+                        <div class="tools d-flex flex-wrap justify-content-around">
+                        <!-- <div class="shapes d-flex flex-wrap justify-content-around"> -->
                             <div class="flexitem" data-tool="line" title="line"><i class="fas fa-minus"></i></div>
                             <div class="flexitem" data-tool="rectangle" title="rectangle"><i class="fas fa-square"></i></div>
-                            <div class="flexitem" data-tool="circle" title="circle"><i class="fas fa-circle"></i></div>
-                            <!-- <div class="flexitem" data-tool="triangle" title="triangle"><i class="fas fa-caret-up"></i></div> -->
+                            <div class="flexitem" data-tool="ellipse" title="ellipse"><i class="fas fa-circle"></i></div>
                             <div class="flexitem" data-tool="triangle" title="triangle"><img src="images/triangle.png"></div>
-                        </div>
+                        <!-- </div> -->
 
-                        <div class="tools d-flex flex-wrap justify-content-around">
                             <div class="flexitem activetool" data-tool="brush" title="brush"><i class="fas fa-paint-brush"></i></div>
                             <div class="flexitem" data-tool="eraser" title="eraser"><i class="fas fa-eraser"></i></div>
                             <div class="flexitem" data-tool="bucket" title="paint bucket"><i class="fas fa-fill-drip"></i></div>
@@ -90,18 +78,30 @@
                         </div>
 
                         <div class="tools d-flex flex-wrap justify-content-around">
-                            <div id="stroke-color-options" class="color-picker">
-                                <input type="color" id="stroke-color-input">
+                            <div id="stroke-color-options" class="color-picker justify-content-center">
+                                <input type="color" title="stroke color" class="color-input" id="stroke-color-input">
+                                <input type="color" title="fill color" value="#FFFFFF"class="color-input" id="fill-color-input">
                             </div>
                         </div>
                     </div>
-                </div>
+              </div>
 
-                <div class="row d-flex justify-content-center" id="tool-options">
-                    <div id="stroke-options" class="d-flex flex-column align-items-between">
+                  <div class="row d-flex justify-content-center" id="tool-options-container">
+                    <div id="tool-options" class="d-flex flex-column align-items-between">
+                      <template id="shape-fill-options-template">
+                        <div id="shape-fill-options">
+                          <label for="shape-fill">Fill</label><br>
+                            <select id="shape-fill-select">
+                                <option value="outline">Outline</option>
+                                <option value="fill">Fill</option>
+                                <option value="outlineFill">Outline and fill</option>
+                            </select>
+                        </div>
+                      </template>
+                      <template id="blend-options-template">
                         <div id="stroke-blend-options" class="stroke-options">
-                            <label for="stroke-size">Blend</label><br>
-                            <select>
+                            <label for="stroke-blend">Blend</label><br>
+                            <select id="stroke-blend-select">
                                 <option value="source-over">Normal</option>
                                 <option value="multiply">Multiply</option>
                                 <option value="screen">Screen</option>
@@ -110,23 +110,28 @@
                                 <option value="difference">Difference</option>
                             </select>
                         </div>
+                      </template>
+                      <template id="stroke-size-options-template">
                         <div id="stroke-size-options" class="stroke-options">
                           <label for="stroke-size">Size</label><br>
                           <input type="range" min="1" max="100" value="5" style="width: 100px" name="stroke-size"id="stroke-size-slider">
                           <input type="number" min="0" max="75" value="5" onClick="this.select();" style="width: 50px" id="stroke-size-input">
                           <span>px</span>
                         </div>
+                      </template>
+                      <template id="stroke-opacity-options-template">
                         <div id="opacity-options" class="stroke-options">
                           <label for="opacity">Opacity</label><br>
                           <input type="range" min="0" max="100" value="100" style="width: 100px" name="opacity"id="stroke-opacity-slider">
                           <input type="number" min="0" max="100" value="100" onClick="this.select();" style="width: 50px" id="stroke-opacity-input">
                           <span>%</span>
                         </div>
+                      </template>
                     </div>
-                </div>
+                  </div>
+            </div>
 
-              </div>
-              <div class="col-md-10 columns">
+            <div class="col-md-10 columns">
                 <div id="form-div">
                   <form id="form">
                     <div class="form-group">
@@ -143,20 +148,12 @@
                     <p>wrong username or password</p>
                   </div> -->
                 </div>
-                <div id="images" class="elements-container d-flex flex-wrap">
-                  <!-- <figure>
-                    <img src="file:///Users/alvee/Downloads/pic1.png">
-                    <figcaption>Image Title</figcaption>
-                  </figure> -->
-                </div>
+                <div id="images" class="elements-container d-flex flex-wrap"></div>
                 <div class="canvas-container grid">
-                    <canvas width="700" height="500" class="canvas first" id="drawing-canvas"></canvas>
-                    <!-- <template id="canvas-template">
-                      <canvas width="700" height="500" class="canvas first" id="drawing-canvas"></canvas>
-                    </template> -->
+                    <canvas width="700" height="500" class="canvas" id="drawing-canvas"></canvas>
                 </div>
-              </div>
             </div>
         </div>
-        </body>
+    </div>
+</body>
 </html>

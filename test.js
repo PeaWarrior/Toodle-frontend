@@ -13,22 +13,29 @@ const DOM = {
   undoButton: document.querySelector('div[data-command="undo"]'),
   redoButton: document.querySelector('div[data-command="redo"]'),
   eraserButton: document.querySelector('div[data-command="eraser"]'),
-  colorPicker: document.querySelector('input#stroke-color-input'),
+  toolOptions: document.querySelector('div#tool-options'),
+  strokeColorInput: document.querySelector('input#stroke-color-input'),
+  fillColorInput: document.querySelector('input#fill-color-input'),
 }
 
 const TEMPLATE = {
-  canvas: document.querySelector('template#canvas-template'),
+  // brushOptions: document.querySelector('template#brush-options-template'),
+  blendOptions: document.querySelector('template#blend-options-template'),
+  strokeSizeOptions: document.querySelector('template#stroke-size-options-template'),
+  strokeOpacityOptions: document.querySelector('template#stroke-opacity-options-template'),
+  shapeFillOptions: document.querySelector('template#shape-fill-options-template'),
 }
 
 const baseURL = "http://localhost:3000";
 
 let ctx = DOM.canvas.getContext('2d');
+
 toggleCanvasHidden();
 
 const TOOLS = {
   line: 'line',
   rectangle: 'rectangle',
-  circle: 'circle',
+  ellipse: 'ellipse',
   triangle: 'triangle',
   brush: 'brush',
   eraser: 'eraser',
@@ -42,6 +49,14 @@ const STATE = {
   currentPos: {x: 0, y: 0},
   userID: 1,
   imageTitle: "",
+  stroke: {
+    blend: 'source-over',
+    brushColor: '0, 0, 0',
+    fillColor: '255, 255, 255',
+    width: 5,
+    opacity: 1,
+    shapeFill: 'outline',
+  },
 }
 
 const startPos = {x: 0, y: 0};
@@ -54,15 +69,37 @@ let savedData;
 STATE.activeTool = TOOLS.brush;
 
 // RUN
+initCtx()
 init();
 
 document.querySelectorAll("[data-tool]").forEach(item => {
-  item.addEventListener('click', e => {
-      document.querySelector("[data-tool].activetool").classList.toggle("activetool");
-      item.classList.toggle("activetool")
-      STATE.activeTool = document.querySelector("[data-tool].activetool").dataset["tool"];
-  })
+  item.addEventListener('click', toggleActiveTool)
 })
+
+function toggleActiveTool() {
+  document.querySelector("[data-tool].activetool").classList.toggle("activetool");
+  this.classList.toggle("activetool");
+  STATE.activeTool = document.querySelector("[data-tool].activetool").dataset["tool"];
+  DOM.toolOptions.innerHTML = ""
+  renderOptions()
+}
+
+function renderOptions() {
+  switch(STATE.activeTool) {
+    case TOOLS.line:
+    case TOOLS.rectangle:
+    case TOOLS.ellipse:
+    case TOOLS.triangle:
+      renderShapeOtions();
+      break;
+    case TOOLS.brush:
+      renderBrushOptions();
+      break;
+    case TOOLS.eraser:
+      renderEraserOptions();
+      break;
+  }
+}
 
 DOM.myDoodle.addEventListener('click', myDoodleFunc);
 
@@ -157,7 +194,8 @@ function displayArt(image) {
 // EVENT FUNCTIONS
 function init() {
   DOM.canvas.onmousedown = e => onMouseDown(e);
-  DOM.colorPicker.addEventListener('input', changeStrokeColor)
+  DOM.strokeColorInput.addEventListener('input', changeStrokeColor)
+  DOM.fillColorInput.addEventListener('input', changeFillColor)
 }
 
 function onMouseDown(e) {
@@ -171,6 +209,8 @@ function onMouseDown(e) {
   startPos.x = e.offsetX;
   startPos.y = e.offsetY;
   if (STATE.activeTool === TOOLS.brush) {
+    ctx.clearRect(0, 0, DOM.canvas.width, DOM.canvas.height)
+    ctx.putImageData(STATE.undo[STATE.undo.length-1], 0, 0)
     points.push(coords)
     drawFreeLine()
   }
@@ -185,7 +225,7 @@ function onMouseMove(e) {
   switch(STATE.activeTool) {
     case TOOLS.line:
     case TOOLS.rectangle:
-    case TOOLS.circle:
+    case TOOLS.ellipse:
     case TOOLS.triangle:
       drawShape();
       break;
@@ -201,15 +241,11 @@ function onMouseMove(e) {
 }
 
 function onMouseUp(e) {
-  points = []
+  points = [];
   savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
-  STATE.undo.push(savedData)
+  STATE.undo.push(savedData);
   DOM.canvas.onmousemove = null;
   document.onmouseup = null;
-}
-
-function changeStrokeColor() {
-  ctx.strokeStyle = `rgba(${hexToRGB(this.value)})`
 }
 
 // DRAW FUNCTIONS
@@ -224,7 +260,7 @@ function drawShape() {
     const rect_width = currentPos.x - startPos.x;
     const rect_height = currentPos.y - startPos.y;
     ctx.rect(startPos.x, startPos.y, rect_width, rect_height);
-  } else if (STATE.activeTool == TOOLS.circle) {
+  } else if (STATE.activeTool == TOOLS.ellipse) {
     const radius = getRadius(startPos, currentPos);
     ctx.arc(startPos.x, startPos.y, radius, 0, Math.PI * 2, false);
   } else if (STATE.activeTool == TOOLS.triangle) {
@@ -233,19 +269,35 @@ function drawShape() {
     ctx.lineTo(currentPos.x, currentPos.y);
     ctx.closePath();
   }
-
+  switch (STATE.stroke.shapeFill) {
+    case "outline":
+      break;
+    case "outlineFill":
+      ctx.fill()
+      break;
+    case "fill":
+      ctx.fillStyle = `rgba(${STATE.stroke.brushColor}, ${STATE.stroke.opacity})`
+      ctx.fill()
+      ctx.fillStyle = `rgba(${STATE.stroke.fillColor}, ${STATE.stroke.opacity})`
+      break;
+    default:
+      break;
+  }
   ctx.stroke();
 }
 
 function drawFreeLine() {
-  // ctx.globalCompositeOperation = 'source-over'
+  ctx.clearRect(0, 0, DOM.canvas.width, DOM.canvas.height)
+  ctx.putImageData(STATE.undo[STATE.undo.length-1], 0, 0)
   STATE.redo = []
   if (points.length < 6) {
+      ctx.fillStyle = `rgba(${STATE.stroke.brushColor}, ${STATE.stroke.opacity})`
       let firstPoint = points[0];
       ctx.beginPath()
       ctx.arc(firstPoint.x, firstPoint.y, ctx.lineWidth / 2, 0, Math.PI * 2, !0)
       ctx.closePath()
       ctx.fill();
+      ctx.fillStyle = `rgba(${STATE.stroke.fillColor}, ${STATE.stroke.opacity})`
       return
   }
   ctx.beginPath()
@@ -262,15 +314,19 @@ function drawFreeLine() {
 function erase() {
   ctx.globalCompositeOperation = 'destination-out'
   drawFreeLine()
-  ctx.globalCompositeOperation = 'source-over'
+  ctx.globalCompositeOperation = STATE.stroke.blend
 }
 
 // UTILITY FUNCTIONS
-function getMouseCoordsOnCanvas(e, canvas) {
-  // let rect = canvas.getBoundingClientRect();
-  // let x = e.clientX - rect.left;
-  // let y = e.clientY - rect.top;
-  // return {x: x, y: y};
+function initCtx() {
+  ctx.lineJoin = 'round'
+  ctx.lineCap = 'round'
+  ctx.globalCompositeOperation = STATE.stroke.blend
+  ctx.strokeStyle = `rgba(${STATE.stroke.brushColor}, ${STATE.stroke.opacity})`
+  ctx.fillStyle = `rgba(${STATE.stroke.fillColor}, ${STATE.stroke.opacity})`
+  ctx.lineWidth = STATE.stroke.width
+}
+function getMouseCoordsOnCanvas(e) {
   return {x: e.offsetX, y: e.offsetY};
 }
 
@@ -293,16 +349,6 @@ function getRadius(coord1, coord2) {
   return Math.sqrt(xPow + yPow);
 }
 
-function createNewCanvasFromTemplate() {
-  if (!!DOM.canvas && confirm('Your will lose all unsaved work.')) {
-      DOM.canvas.remove()
-  }
-  let newCanvas = TEMPLATE.canvas.content.cloneNode(true).querySelector('canvas')
-  DOM.canvas = newCanvas
-  ctx = DOM.canvas.getContext('2d')
-  init()
-}
-
 function clearCanvasStates() {
   STATE.undo.length = 0
   STATE.redo.length = 0
@@ -317,6 +363,10 @@ function toggleCanvasHidden() {
   DOM.canvasContainer.hidden = !DOM.canvasContainer.hidden;
 }
 
+String.prototype.capitalize = function() {
+  return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
 // COMMAND EVENTS
 DOM.newButton.addEventListener('click', newCanvas)
 DOM.downloadButton.addEventListener('click', downloadCanvas)
@@ -326,9 +376,7 @@ DOM.redoButton.addEventListener('click', redoCanvas)
 
 // COMMAND FUNCTIONS
 function newCanvas() {
-  // createNewCanvasFromTemplate()
   promptAndSetImageTitle();
-  // DOM.canvasContainer.append(DOM.canvas);
   clearCanvasStates();
   toggleCanvasHidden();
 }
@@ -369,4 +417,93 @@ function createFigureElement(image) {
     figcaption.textContent = `${image.title}`;
   figure.append(img, figcaption);
   return figure;
+}
+
+function renderBrushOptions() {
+  const toolHeader = document.createElement('h6')
+    toolHeader.innerText = `${STATE.activeTool.capitalize()} tool`
+  DOM.toolOptions.append(toolHeader, renderBlendOptions(), renderSizeOptions(), renderOpacityOptions())
+}
+
+function renderShapeOtions() {
+  const toolHeader = document.createElement('h6')
+    toolHeader.innerText = `${STATE.activeTool.capitalize()} tool`
+  DOM.toolOptions.append(toolHeader, renderShapeFillOptions(), renderBlendOptions(), renderSizeOptions(), renderOpacityOptions())
+}
+
+function renderEraserOptions() {
+  const toolHeader = document.createElement('h6')
+    toolHeader.innerText = `${STATE.activeTool.capitalize()} tool`
+  DOM.toolOptions.append(toolHeader, renderSizeOptions(), renderOpacityOptions())
+}
+
+function renderBlendOptions() {
+  const blendOptions = TEMPLATE.blendOptions.cloneNode(true).content.querySelector('div#stroke-blend-options')
+  const blendSelector = blendOptions.querySelector('select#stroke-blend-select')
+    blendSelector.value = STATE.stroke.blend
+    blendSelector.addEventListener('input', changeBlend)
+  return blendOptions
+}
+
+function renderSizeOptions() {
+  const strokeSizeOptions = TEMPLATE.strokeSizeOptions.cloneNode(true).content.querySelector('div#stroke-size-options')
+  const strokeSizeOptionInputs = strokeSizeOptions.querySelectorAll('input')
+  strokeSizeOptionInputs.forEach((input) => {
+    input.value = STATE.stroke.width
+    input.addEventListener('input', changeStrokeSize)
+  })
+  return strokeSizeOptions
+}
+
+function renderOpacityOptions() {
+  const strokeOpacityOptions = TEMPLATE.strokeOpacityOptions.cloneNode(true).content.querySelector('div#opacity-options')
+  const strokeOpacityOptionInputs = strokeOpacityOptions.querySelectorAll('input')
+  strokeOpacityOptionInputs.forEach((input) => {
+    input.value = STATE.stroke.opacity*100
+    input.addEventListener('input', changeStrokeOpacity)
+  })
+  return strokeOpacityOptions
+}
+
+function renderShapeFillOptions() {
+  const shapeFillOptions = TEMPLATE.shapeFillOptions.cloneNode(true).content.querySelector('div#shape-fill-options')
+  const shapeFillSelect = shapeFillOptions.querySelector('select#shape-fill-select')
+  shapeFillSelect.value = STATE.stroke.shapeFill
+  shapeFillSelect.addEventListener('input', changeShapeFill)
+  return shapeFillOptions
+}
+
+// CHANGE STATE FUNCTIONS
+function changeShapeFill() {
+  console.log(this.value)
+  STATE.stroke.shapeFill = this.value
+}
+
+function changeStrokeColor() {
+  STATE.stroke.brushColor = hexToRGB(this.value);
+  ctx.strokeStyle = `rgba(${STATE.stroke.brushColor}, ${STATE.stroke.opacity})`;
+}
+
+function changeFillColor() {
+  STATE.stroke.fillColor = hexToRGB(this.value);
+  ctx.fillStyle = `rgba(${STATE.stroke.fillColor}, ${STATE.stroke.opacity})`;
+}
+
+function changeBlend() {
+  STATE.stroke.blend = this.value
+  ctx.globalCompositeOperation = STATE.stroke.blend
+}
+
+function changeStrokeSize() {
+  isLegitValue(this, 1, 100)
+  this.id === "stroke-size-slider" ? this.nextElementSibling.value = this.value : this.previousElementSibling.value = this.value
+  STATE.stroke.width = this.value
+  ctx.lineWidth = STATE.stroke.width
+}
+
+function changeStrokeOpacity() {
+  isLegitValue(this, 1, 100)
+  this.id === "stroke-opacity-slider" ? this.nextElementSibling.value = this.value : this.previousElementSibling.value = this.value
+  STATE.stroke.opacity = this.value/100
+  ctx.globalAlpha = STATE.stroke.opacity
 }
