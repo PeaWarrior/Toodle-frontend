@@ -18,11 +18,11 @@ h6 {
 }
 label {
     margin: 0;
-    color: #5c80bc;
+    color: #1c448e;
 }
 
 span {
-    color: #5c80bc;
+    color: #1c448e;
 }
 
 .select-label {
@@ -30,21 +30,22 @@ span {
 }
 
 nav {
+    background-color: beige;
     font-size: 1.2rem;
-    border-bottom: 1px solid #5c80bc;
+    border-bottom: 1px solid #775144;
 }
 
 .brand {
-    color: #5c80bc !important;
+    color: #47abcc !important;
 }
 
 .authentication-btn {
-    border: 1px solid #5c80bc;
-    color: #5c80bc;
+    border: 1px solid #47abcc;
+    color: #47abcc;
 }
 
 .authentication-btn:hover {
-    background: #5c80bc;
+    background: #47abcc;
     color: #f5f5dc;
 }
 
@@ -53,7 +54,7 @@ nav {
 }
 
 .sidebar-left {
-    background-color: #f5f5dc;
+    background-color: beige;
     border-right: 1px solid #5c80bc;
     border-bottom: 1px solid #5c80bc;
 }
@@ -69,10 +70,25 @@ nav {
 
 .option-input {
     border: 1px solid #5c80bc;
-    color: #eb9486;
+    color: #47abcc;
     padding: 0;
     margin: 0 0 5px 0;
     width: 40px;
+}
+#text-span {
+    margin: 0.5em 0 0 0;
+}
+#text-input {
+    border: 1px solid #1c448e;
+    padding: 5px;
+    margin: auto;
+    color: #1c448e;
+}
+
+#text-font-size {
+    padding: 0 !important;
+    width: 3em;
+    margin-left: 0;
 }
 
 .commands, .tools {
@@ -85,7 +101,7 @@ nav {
     /* height: 40px; */
     padding: 5px 0;
     margin: 5px;
-    border: 2px solid #7e7f9a;
+    border: 2px solid #645244;
     border-radius: 5px;
     text-align: center;
 }
@@ -95,13 +111,13 @@ div[data-tool='triangle'] img {
 }
 
 .flexitem:hover {
-    background-color: #5c80bc;
+    background-color: #47abcc;
     cursor: pointer;
 }
 
 .activetool {
-    background-color: #5c80bc;
-    border: 2px solid #648767;
+    background-color: #48b8d0;
+    border: 2px solid #1c448e;
 }
 
 .color-picker {
@@ -127,15 +143,15 @@ input.color-input:hover {
     font-size: small;
     margin: 5px;
     padding: 5px !important;
-    color: #eb9486;
+    color: #47abcc;
 }
 
 .select-option:hover {
-    color: #eb9486;
+    color: #f26419;
 }
 
 .tool-header {
-    color: #5c80bc;
+    color: #1c448e;
 }
 
 input[type='range'] {
@@ -158,8 +174,8 @@ input[type='range']::-webkit-slider-thumb {
     width: 10px;
     -webkit-appearance: none;
     height: 20px;
-    background: #eb9486;
-    box-shadow: -80px 0 0 78px #5c80bc;
+    background: #1c448e;
+    box-shadow: -80px 0 0 78px #48b8d0;
     border-radius: 5px;
 }
 
@@ -218,6 +234,6 @@ form {
 }
 
 #form-submit {
-    color: #5c80bc;
+    color: #1c448e;
     border: 1px solid #5c80bc;
 }

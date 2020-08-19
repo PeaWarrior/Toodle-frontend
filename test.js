@@ -58,9 +58,12 @@ const STATE = {
     opacity: 1,
     shapeFill: 'outline',
   },
-  drawTextInput: "Help Pls",
-  ctxFontSize: "40px",
-  ctxFontFamily: "sans-serif",
+  text: {
+    drawTextInput: "",
+    ctxFontSize: "40",
+    ctxFontFamily: "Arial",
+    textFill: 'outline'
+  }
 }
 
 const startPos = {x: 0, y: 0};
@@ -171,7 +174,7 @@ function login(username, password) {
 
 // UI FUNCTIONS
 function myDoodleFunc(e) {
-  userResponse = confirm("WILL DESTROY EVERYTHING!!!")
+  userResponse = confirm("All unsaved work will be lost.")
   if (userResponse) {
     STATE.imageTitle = "";
     DOM.imageTitle.textContent = STATE.imageTitle;
@@ -179,8 +182,6 @@ function myDoodleFunc(e) {
     clearCanvas();
     toggleCanvasHidden();
     fetchAndShowUserWorks();
-  } else {
-    console.log("lol got scared for a sec...");
   }
 }
 
@@ -262,7 +263,21 @@ function drawText() {
   ctx.font = getCtxText();
   ctx.putImageData(savedData, 0, 0);
   ctx.beginPath();
-  ctx.strokeText(STATE.drawTextInput, startPos.x, startPos.y);
+  switch (STATE.text.textFill) {
+    case "outline":
+      break;
+    case "outlineFill":
+      ctx.fillText(STATE.text.drawTextInput, startPos.x, startPos.y)
+      break;
+    case "fill":
+      ctx.fillStyle = `rgba(${STATE.stroke.brushColor}, ${STATE.stroke.opacity})`
+      ctx.fillText(STATE.text.drawTextInput, startPos.x, startPos.y)
+      ctx.fillStyle = `rgba(${STATE.stroke.fillColor}, ${STATE.stroke.opacity})`
+      break;
+    default:
+      break;
+  }
+  ctx.strokeText(STATE.text.drawTextInput, startPos.x, startPos.y);
   ctx.closePath();
 }
 
@@ -385,7 +400,7 @@ String.prototype.capitalize = function() {
 }
 
 function getCtxText() {
-  return `${STATE.ctxFontSize} ${STATE.ctxFontFamily}`;
+  return `${STATE.text.ctxFontSize}px ${STATE.text.ctxFontFamily}`;
 }
 
 // COMMAND EVENTS
@@ -496,25 +511,26 @@ function renderShapeFillOptions() {
 }
 
 function renderTextOptions() {
-  const toolHeader = document.createElement('h6')
-    toolHeader.innerText = `${STATE.activeTool.capitalize()} tool`
   const textOptions = TEMPLATE.textOptions.cloneNode(true).content.querySelector('div#text-options')
   const textInput = textOptions.querySelector('input#text-input')
-    textInput.value = STATE.drawTextInput
+    textInput.value = STATE.text.drawTextInput
     textInput.addEventListener('input', changeDrawTextInput)
-    debugger
   const textFontFamily = textOptions.querySelector('select#text-font-family')
-    textFontFamily.value = STATE.ctxFontFamily
+    textFontFamily.value = STATE.text.ctxFontFamily
     textFontFamily.addEventListener('input', changeFontFamily)
   const textFontSize = textOptions.querySelector('input#text-font-size')
-    textFontSize.value = STATE.ctxFontSize
-    textFontFamily.addEventListener('input', changeFontSize)
-  DOM.toolOptions.append(toolHeader, textOptions)
+    textFontSize.value = STATE.text.ctxFontSize
+    textFontSize.addEventListener('input', changeFontSize)
+  DOM.toolOptions.append(renderToolHeader(), renderShapeFillOptions(), textOptions)
 }
 
 // CHANGE STATE FUNCTIONS
 function changeShapeFill() {
-  STATE.stroke.shapeFill = this.value
+  if (STATE.activeTool === 'text') {
+    STATE.text.textFill = this.value
+  } else {
+    STATE.stroke.shapeFill = this.value
+  }
 }
 
 function changeStrokeColor() {
@@ -547,13 +563,13 @@ function changeStrokeOpacity() {
 }
 
 function changeDrawTextInput() {
-  STATE.drawTextInput = this.value
+  STATE.text.drawTextInput = this.value
 }
 
 function changeFontFamily() {
-  STATE.ctxFontFamily = this.value
+  STATE.text.ctxFontFamily = this.value
 }
 
 function changeFontSize() {
-  STATE.ctxFontSize = this.value
+  STATE.text.ctxFontSize = this.value
 }

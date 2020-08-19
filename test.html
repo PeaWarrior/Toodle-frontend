@@ -16,7 +16,7 @@
     <script defer src="test.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light">
         <a class="navbar-brand brand" href="#">
           <i class="fas fa-palette"></i>
           Toodle
@@ -92,16 +92,34 @@
                   <div class="row d-flex justify-content-center" id="tool-options-container">
                     <div id="tool-options" class="d-flex flex-column align-items-between">
                       <template id="text-options-template">
-                        <div id="text-options" class="text-options">
-                          <label for="text-input">Text</label><br>
-                          <input type="text" value="" name="text-input" id="text-input">
-                          <label for="text-font-family" class="select-label">Font</label><br>
-                          <select id="text-font-family">
-                            <option value="sans-serif">sans-serif</option>
-                            <option value="sans-serif">sans-serif</option>
-                            <option value="sans-serif">sans-serif</option>
-                          </select>
-                          <input id="text-font-size" type="number" value="12">
+                        <div id="text-options" class="d-flex flex-column justify-content-center">
+                          <br>
+                          <div class="d-flex justify-content-between">
+                            <input type="text" value="" name="text-input" id="text-input" placeholder="Enter text here" class="btn"><br>
+                          </div><br>
+                          <div class="d-flex">
+                            <select id="text-font-family" class="btn select-option">
+                              <option value="Arial">Arial</option>
+                              <option value="Arial Narrow">Arial Narrow</option>
+                              <option value="Calibri">Calibri</option>
+                              <option value="Cambria">Cambria</option>
+                              <option value="Candara">Candara</option>
+                              <option value="Comic Sans MS">Comic Sans MS</option>
+                              <option value="Courier">Courier</option>
+                              <option value="Courier New">Courier New</option>
+                              <option value="Garamond">Garamond</option>
+                              <option value="Geneva">Geneva</option>
+                              <option value="Helvetica">Helvetica</option>
+                              <option value="Monaco">Monaco</option>
+                              <option value="Sans-serif">Sans-serif</option>
+                              <option value="Tahoma">Tahoma</option>
+                              <option value="Times">Times</option>
+                              <option value="Times New Roman">Times New Roman</option>
+                              <option value="Verdana">Verdana</option>
+                            </select>
+                            <input id="text-font-size" type="number" value="12" class="btn option-input select-option">
+                            <span id="text-span">px</span>
+                          </div>
                         </div>
                       </template>
                       <template id="shape-fill-options-template">
@@ -115,7 +133,7 @@
                         </div>
                       </template>
                       <template id="blend-options-template">
-                        <div id="stroke-blend-options" class=" d-flex justify-content-between">
+                        <div id="stroke-blend-options" class="d-flex justify-content-between">
                             <label for="stroke-blend" class="select-label">Blend</label>
                             <select id="stroke-blend-select" class="btn select-option">
                                 <option value="source-over">Normal</option>
