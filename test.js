@@ -53,6 +53,8 @@ const TOOLS = {
   line: 'line',
   rectangle: 'rectangle',
   ellipse: 'ellipse',
+  circle: 'circle',
+  star: 'star',
   triangle: 'triangle',
   brush: 'brush',
   eraser: 'eraser',
@@ -115,8 +117,10 @@ function renderOptions() {
   switch(STATE.activeTool) {
     case TOOLS.line:
     case TOOLS.rectangle:
-    case TOOLS.ellipse:
+    case TOOLS.circle:
     case TOOLS.triangle:
+    case TOOLS.ellipse:
+    case TOOLS.star:
       renderShapeOptions();
       break;
     case TOOLS.brush:
@@ -422,7 +426,7 @@ function onMouseMove(e) {
   switch(STATE.activeTool) {
     case TOOLS.line:
     case TOOLS.rectangle:
-    case TOOLS.ellipse:
+    case TOOLS.circle:
     case TOOLS.triangle:
       drawShape();
       break;
@@ -479,7 +483,7 @@ function drawShape() {
     const rect_width = currentPos.x - startPos.x;
     const rect_height = currentPos.y - startPos.y;
     ctx.rect(startPos.x, startPos.y, rect_width, rect_height);
-  } else if (STATE.activeTool == TOOLS.ellipse) {
+  } else if (STATE.activeTool == TOOLS.circle) {
     const radius = getRadius(startPos, currentPos);
     ctx.arc(startPos.x, startPos.y, radius, 0, Math.PI * 2, false);
   } else if (STATE.activeTool == TOOLS.triangle) {
