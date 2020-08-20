@@ -173,6 +173,8 @@ function login(username, password) {
     .catch(err => console.log(err));
 }
 
+DOM.imageTitle.addEventListener('input', selectTitleInput)
+
 // UI FUNCTIONS
 function myDoodleFunc(e) {
   userResponse = confirm("All unsaved work will be lost.")
@@ -198,6 +200,10 @@ function fetchAndShowUserWorks() {
 function displayArt(image) {
   const figureElement = createFigureElement(image);
   DOM.images.append(figureElement);
+}
+
+function selectTitleInput() {
+  STATE.imageTitle = this.value
 }
 
 // EVENT FUNCTIONS
@@ -389,7 +395,7 @@ function clearCanvasStates() {
 
 function promptAndSetImageTitle() {
   STATE.imageTitle = prompt("Please enter a title (PG-13)");
-  DOM.imageTitle.textContent = STATE.imageTitle || "Untitled";
+  DOM.imageTitle.value = STATE.imageTitle || "Untitled";
 }
 
 function toggleCanvasHidden() {
@@ -418,7 +424,7 @@ function saveCanvas() {
     let imageObj = {
         image: {
             user_id: `${STATE.userID}`,
-            title: "cool",
+            title: DOM.imageTitle.value,
             art: dataURL
         }
     }
