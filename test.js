@@ -67,6 +67,7 @@ const STATE = {
   username: "",
   imageTitle: "",
   canvasID: null,
+  pressedKeys: new Set(),
   stroke: {
     blend: 'source-over',
     brushColor: '0, 0, 0',
@@ -772,3 +773,27 @@ function postCanvas() {
   .then(resp => resp.json())
   .then(data => console.log(data))
 }
+
+// KEYBOARD EVENT LISTENERS
+function funcOnKeys(func, ...codes) {
+  let pressed = new Set();
+
+  document.addEventListener('keydown', function(event) {
+    pressed.add(event.code);
+
+    for (let code of codes) {
+      if (!pressed.has(code)) {
+        return;
+      }
+    }
+
+    pressed.clear();
+    func();
+  })
+
+  document.addEventListener('keyup', (event) => pressed.delete(event.code));
+}
+
+funcOnKeys(undoCanvas, "ControlLeft", "KeyZ");
+funcOnKeys(undoCanvas, "MetaLeft", "KeyZ");
+funcOnKeys(redoCanvas, "ShiftLeft", "KeyZ");
