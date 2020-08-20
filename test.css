@@ -217,6 +217,16 @@ div#form-error {
     color: red;
 }
 
+div#form-success {
+    margin: 20px 0;
+    padding: 0 30px;
+    width: 100%;
+    font-size: 1.4rem;
+    background-color: lightgreen;
+    font-style: bold;
+    color: darkgreen;
+}
+
 .canvas {
     border: 1px #5c80bc solid;
 }
