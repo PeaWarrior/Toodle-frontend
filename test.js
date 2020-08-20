@@ -825,6 +825,7 @@ function postCanvas(imageObj) {
 }
 
 // KEYBOARD EVENT LISTENERS
+
 function funcOnKeys(func, ...codes) {
   let pressed = new Set();
 
