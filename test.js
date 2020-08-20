@@ -63,7 +63,7 @@ const STATE = {
   redo: [],
   startPos: {x: 0, y: 0},
   currentPos: {x: 0, y: 0},
-  userID: 1,
+  userID: null,
   username: "",
   imageTitle: "",
   canvasID: null,
@@ -167,11 +167,14 @@ function patchUser(e) {
 function logout() {
   STATE.userID = "";
   STATE.username = "";
+  DOM.images.innerHTML = ""
   hideEditLogoutButtons();
   showLoginSignupButtons();
   showLoginForm();
   hideEditForm();
-  toggleCanvasHidden();
+  if (DOM.canvas.hidden) {
+    toggleCanvasHidden();
+  }
 }
 
 function showLoginForm(e) {
@@ -278,6 +281,7 @@ function login(username, password) {
       hideLoginSignupButtons();
       showEditLogoutButtons();
       DOM.form.hidden = true;
+      DOM.imageTitle.value = 'Untitled'
       toggleCanvasHidden();
     })
     .catch(err => {
@@ -321,14 +325,18 @@ function hideEditLogoutButtons() {
 }
 
 function myDoodleFunc(e) {
-  userResponse = confirm("All unsaved work will be lost.")
-  if (userResponse) {
+  if (!STATE.userID) {
+    alert('You must be logged in to view your Doodles!')
+  } else {
+    userResponse = confirm("All unsaved work will be lost.")
+    if (userResponse) {
     STATE.imageTitle = "";
-    DOM.imageTitle.textContent = STATE.imageTitle;
+    DOM.imageTitle.value = STATE.imageTitle;
     // HIDE CANVAS
     clearCanvas();
     toggleCanvasHidden();
     fetchAndShowUserWorks();
+    }
   }
 }
 
@@ -572,14 +580,28 @@ function saveCanvas() {
             art: dataURL
         }
     }
-    !!STATE.canvasID ? updateCanvas(imageObj) : postCanvas(imageObj)
+    if (isUserAuthenticated()) {
+      !!STATE.canvasID ? updateCanvas(imageObj) : postCanvas(imageObj)
+    } else {
+      alert('Please log in or sign up to begin Doodling!')
+    }
+}
+
+function isUserAuthenticated() {
+  !!STATE.userID ? true : false
 }
 
 function newCanvas() {
-  STATE.canvasID = null;
-  promptAndSetImageTitle();
-  clearCanvasStates();
-  toggleCanvasHidden();
+  if (isUserAuthenticated()) {
+    DOM.images.innerHTML = '';
+    DOM.imageTitle = 'Untitled';
+    STATE.canvasID = null;
+    promptAndSetImageTitle();
+    clearCanvasStates();
+    toggleCanvasHidden();
+  } else {
+    alert('Please log in or sign up to start Doodling!')
+  }
 }
 
 function clearCanvas() {
@@ -618,18 +640,21 @@ function createFigureElement(image) {
   const figcaption = document.createElement('figcaption');
     figcaption.textContent = `${image.title}`;
   figure.append(img, figcaption);
-
-  img.addEventListener('click', displayImageOnCanvas(image.id))
+  img.addEventListener('click', displayImageOnCanvas(image))
   return figure;
 }
 
-function displayImageOnCanvas(imageID) {
+function displayImageOnCanvas(imageObj) {
   return function() {
+    STATE.imageTitle = imageObj.title
+    DOM.images.innerHTML = ""
+    DOM.imageTitle.value = STATE.imageTitle
+    toggleCanvasHidden()
     ctx.drawImage(this, 0, 0)
     savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
     STATE.undo.length = 0
     STATE.undo.push(savedData)
-    STATE.canvasID = imageID
+    STATE.canvasID = imageObj.id
   }
 }
 
@@ -767,7 +792,7 @@ function updateCanvas(imageObj) {
   .then(data => console.log(data))
 }
 
-function postCanvas() {
+function postCanvas(imageObj) {
   fetch(`http://localhost:3000/images/`, {
       method: 'POST',
       headers: {
