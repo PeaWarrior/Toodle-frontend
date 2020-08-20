@@ -139,23 +139,29 @@ nav {
 }
 
 .color-picker {
-    width: 100%;
+    width: 50px;
+    height: 40px;
     display: flex;
-    margin: 0 10px 10px 10px;
+    padding: 5px 0;
+    margin: 5px;
 }
 
-/* #stroke-color-input {
-
+#stroke-color-input {
+    position: absolute;
+    z-index: 1;
 }
 
 #fill-color-input {
-
-} */
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 10px;
+    z-index: 0;
+}
 
 input.color-input {
     display: block;
-    width: 60px;
-    height: 55px;
+    width: 40px;
+    height: 35px;
     padding: 0;
     background: transparent;
     border: 1px grey solid;
