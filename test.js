@@ -670,14 +670,34 @@ function redoCanvas() {
 // CREATE DOM ELEMENTS FUNCTIONS
 function createFigureElement(image) {
   const figure = document.createElement('figure');
+  const deleteBtn = document.createElement('span')
+    deleteBtn.innerText = "x"
+    deleteBtn.classList.add('delete-image')
+    deleteBtn.dataset.imageId = image.id
   const img = document.createElement('img');
     img.crossOrigin = "Anonymous"
     img.src = `${baseURL}${image.art.url}`
   const figcaption = document.createElement('figcaption');
     figcaption.textContent = `${image.title}`;
-  figure.append(img, figcaption);
-  img.addEventListener('click', displayImageOnCanvas(image))
+  figure.append(deleteBtn, img, figcaption);
+  img.addEventListener('click', displayImageOnCanvas(image));
+  deleteBtn.addEventListener('click', promptDelete)
   return figure;
+}
+
+function promptDelete() {
+  let response = confirm('Are you sure you want to delete this Doodle?')
+  if (response) {
+    deleteImage(this.dataset.imageId)
+  }
+}
+
+function deleteImage(imageObjId) {
+  fetch(`http://localhost:3000/images/${imageObjId}`, {
+    method: 'DELETE'
+  })
+  .then(resp => resp.json())
+  .then(data => fetchAndShowUserWorks())
 }
 
 function displayImageOnCanvas(imageObj) {
