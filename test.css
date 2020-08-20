@@ -251,6 +251,11 @@ div#form-success {
     border: 1px #5c80bc solid;
 }
 
+#canvas-message p {
+    font-size: small;
+    color: gray;
+}
+
 form {
     padding: 5% 5% 0 5%;
 }

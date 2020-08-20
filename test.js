@@ -1,6 +1,8 @@
 const DOM = {
   canvasContainer: document.querySelector('div.canvas-container'),
   canvas: document.querySelector('canvas#drawing-canvas'),
+  canvasMessage: document.querySelector('div#canvas-message'),
+  canvasMessageP: document.querySelector('div#canvas-message p'),
   images: document.querySelector('#images'),
   imageTitle: document.querySelector('#image-title'),
   myDoodle: document.querySelector('#my-doodles'),
@@ -168,8 +170,7 @@ function patchUser(e) {
 function logout() {
   STATE.userID = "";
   STATE.username = "";
-  STATE.imageTitle = ""
-  DOM.imageTitle.value = STATE.imageTitle
+  clearImageTitle()
   hideDomElements();
   hideEditLogoutButtons();
   showLoginSignupButtons();
@@ -344,6 +345,12 @@ function hideEditLogoutButtons() {
   DOM.logoutButton.hidden = true;
 }
 
+function showCanvasMessage(message) {
+  DOM.canvasMessageP.textContent = message;
+  DOM.canvasMessage.hidden = false;
+  setTimeout(() => DOM.canvasMessage.hidden = true, 2000);
+}
+
 function myDoodleFunc(e) {
   if (!STATE.userID) {
     alert('You must be logged in to view your Doodles!')
@@ -352,7 +359,6 @@ function myDoodleFunc(e) {
       userResponse = confirm("All unsaved work will be lost.")
       if (userResponse) {
         clearImageTitle()
-        // HIDE CANVAS
         clearCanvas();
         toggleCanvasHidden();
       } else return
@@ -597,7 +603,7 @@ function saveCanvas() {
   if (!STATE.userID) {
     alert('Please log in or sign up to begin Doodling!')
     return
-  } 
+  }
   let dataURL = DOM.canvas.toDataURL()
   let imageObj = {
       image: {
@@ -626,6 +632,7 @@ function clearCanvas() {
   ctx.clearRect(0, 0, 700, 500)
   savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
   STATE.undo.push(savedData)
+  showCanvasMessage('Cleared')
 }
 
 function downloadCanvas() {
@@ -633,6 +640,9 @@ function downloadCanvas() {
     alert('Please log in or sign up to begin Doodling!')
     return
   } 
+  if (DOM.canvasContainer.hidden === true) {
+    return
+  }
   let tempLink = document.createElement('a')
   tempLink.href = DOM.canvas.toDataURL()
   tempLink.download = ''
@@ -819,7 +829,7 @@ function updateCanvas(imageObj) {
       body: JSON.stringify(imageObj)
   })
   .then(resp => resp.json())
-  .then(data => console.log(data))
+  .then(imageData => showCanvasMessage(`Saved`))
 }
 
 function postCanvas(imageObj) {
@@ -831,7 +841,10 @@ function postCanvas(imageObj) {
       body: JSON.stringify(imageObj)
   })
   .then(resp => resp.json())
-  .then(data => console.log(data))
+  .then(imageData => {
+    STATE.canvasID = imageData.id
+    showCanvasMessage(`Saved`)
+  })
 }
 
 // KEYBOARD EVENT LISTENERS
