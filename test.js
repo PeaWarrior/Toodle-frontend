@@ -172,7 +172,7 @@ function logout() {
   showLoginSignupButtons();
   showLoginForm();
   hideEditForm();
-  if (DOM.canvas.hidden) {
+  if (!DOM.canvasContainer.hidden) {
     toggleCanvasHidden();
   }
 }
@@ -200,6 +200,7 @@ function hideEditForm(e) {
 }
 
 function toggleEditForm(e) {
+  hideDomElements()
   DOM.editFormUsername.value = STATE.username;
   DOM.editForm.hidden = !DOM.editForm.hidden;
 }
@@ -247,12 +248,16 @@ function signup(username, password) {
   fetch('http://localhost:3000/signup', postConfig)
     .then(res => res.json())
     .then(user => {
-      STATE.userID = user.id;
-      STATE.username = user.username;
-      hideLoginSignupButtons();
-      showEditLogoutButtons();
-      DOM.form.hidden = true;
-      toggleCanvasHidden();
+      if (user.status !== 200 && user.status !== 201) {
+        throw new Error("Bad response from server")
+      } else {
+        STATE.userID = user.id;
+        STATE.username = user.username;
+        hideLoginSignupButtons();
+        showEditLogoutButtons();
+        DOM.form.hidden = true;
+        toggleCanvasHidden();
+      }
     })
     .catch(err => {
       showFormError("username is taken");
@@ -276,13 +281,17 @@ function login(username, password) {
   fetch('http://localhost:3000/login', postConfig)
     .then(res => res.json())
     .then(user => {
-      STATE.userID = user.id;
-      STATE.username = user.username;
-      hideLoginSignupButtons();
-      showEditLogoutButtons();
-      DOM.form.hidden = true;
-      DOM.imageTitle.value = 'Untitled'
-      toggleCanvasHidden();
+      if (user.status !== 200 && user.status !== 201) {
+        throw new Error("Bad response from server")
+      } else {
+        STATE.userID = user.id;
+        STATE.username = user.username;
+        hideLoginSignupButtons();
+        showEditLogoutButtons();
+        DOM.form.hidden = true;
+        DOM.imageTitle.value = 'Untitled'
+        toggleCanvasHidden();
+      }
     })
     .catch(err => {
       showFormError("password doesn't match");
@@ -292,6 +301,13 @@ function login(username, password) {
 DOM.imageTitle.addEventListener('input', selectTitleInput)
 
 // UI FUNCTIONS
+function hideDomElements() {
+  DOM.images.innerHTML = "";
+  DOM.canvasContainer.hidden = true;
+  DOM.editForm.hidden = true;
+  
+}
+
 function showFormError(message="wrong username or password") {
   DOM.formErrorP.textContent = message;
   DOM.formError.hidden = false;
@@ -328,15 +344,18 @@ function myDoodleFunc(e) {
   if (!STATE.userID) {
     alert('You must be logged in to view your Doodles!')
   } else {
-    userResponse = confirm("All unsaved work will be lost.")
-    if (userResponse) {
-    STATE.imageTitle = "";
-    DOM.imageTitle.value = STATE.imageTitle;
-    // HIDE CANVAS
-    clearCanvas();
-    toggleCanvasHidden();
-    fetchAndShowUserWorks();
+    if (!DOM.canvasContainer.hidden) {
+      userResponse = confirm("All unsaved work will be lost.")
+      if (userResponse) {
+        STATE.imageTitle = "";
+        DOM.imageTitle.value = STATE.imageTitle;
+        // HIDE CANVAS
+        clearCanvas();
+        toggleCanvasHidden();
+      } else return
     }
+    hideDomElements()
+    fetchAndShowUserWorks();
   }
 }
 
@@ -572,29 +591,25 @@ DOM.saveButton.addEventListener('click', saveCanvas)
 
 // COMMAND FUNCTIONS
 function saveCanvas() {
-    let dataURL = DOM.canvas.toDataURL()
-    let imageObj = {
-        image: {
-            user_id: `${STATE.userID}`,
-            title: DOM.imageTitle.value,
-            art: dataURL
-        }
-    }
-    if (isUserAuthenticated()) {
-      !!STATE.canvasID ? updateCanvas(imageObj) : postCanvas(imageObj)
-    } else {
-      alert('Please log in or sign up to begin Doodling!')
-    }
-}
-
-function isUserAuthenticated() {
-  !!STATE.userID ? true : false
+  if (!STATE.userID) {
+    alert('Please log in or sign up to begin Doodling!')
+    return
+  } 
+  let dataURL = DOM.canvas.toDataURL()
+  let imageObj = {
+      image: {
+          user_id: `${STATE.userID}`,
+          title: DOM.imageTitle.value,
+          art: dataURL
+      }
+  }
+  !!STATE.canvasID ? updateCanvas(imageObj) : postCanvas(imageObj)
 }
 
 function newCanvas() {
-  if (isUserAuthenticated()) {
-    DOM.images.innerHTML = '';
-    DOM.imageTitle = 'Untitled';
+  if (!!STATE.userID) {
+    hideDomElements()
+    ctx.clearRect(0, 0, DOM.canvas.width, DOM.canvas.height)
     STATE.canvasID = null;
     promptAndSetImageTitle();
     clearCanvasStates();
@@ -611,6 +626,10 @@ function clearCanvas() {
 }
 
 function downloadCanvas() {
+  if (!STATE.userID) {
+    alert('Please log in or sign up to begin Doodling!')
+    return
+  } 
   let tempLink = document.createElement('a')
   tempLink.href = DOM.canvas.toDataURL()
   tempLink.download = ''
