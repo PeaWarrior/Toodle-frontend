@@ -72,8 +72,8 @@ nav {
     height: auto;
 }
 
-#tools {
-    border-bottom: 1px solid #7e7f9a;
+.tools {
+    margin-bottom: 15px !important;
     height: auto;
 }
 #tool-options-container {
