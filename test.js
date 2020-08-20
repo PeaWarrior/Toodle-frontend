@@ -1,6 +1,8 @@
 const DOM = {
   canvasContainer: document.querySelector('div.canvas-container'),
   canvas: document.querySelector('canvas#drawing-canvas'),
+  canvasMessage: document.querySelector('div#canvas-message'),
+  canvasMessageP: document.querySelector('div#canvas-message p'),
   images: document.querySelector('#images'),
   imageTitle: document.querySelector('#image-title'),
   myDoodle: document.querySelector('#my-doodles'),
@@ -51,6 +53,8 @@ const TOOLS = {
   line: 'line',
   rectangle: 'rectangle',
   ellipse: 'ellipse',
+  circle: 'circle',
+  star: 'star',
   triangle: 'triangle',
   brush: 'brush',
   eraser: 'eraser',
@@ -107,16 +111,18 @@ function toggleActiveTool() {
   document.querySelector("[data-tool].activetool").classList.toggle("activetool");
   this.classList.toggle("activetool");
   STATE.activeTool = document.querySelector("[data-tool].activetool").dataset["tool"];
-  DOM.toolOptions.innerHTML = ""
-  renderOptions()
+  clearChildren(DOM.toolOptions);
+  renderOptions();
 }
 
 function renderOptions() {
   switch(STATE.activeTool) {
     case TOOLS.line:
     case TOOLS.rectangle:
-    case TOOLS.ellipse:
+    case TOOLS.circle:
     case TOOLS.triangle:
+    case TOOLS.ellipse:
+    case TOOLS.star:
       renderShapeOptions();
       break;
     case TOOLS.brush:
@@ -170,14 +176,11 @@ function patchUser(e) {
 function logout() {
   STATE.userID = "";
   STATE.username = "";
-  DOM.images.innerHTML = ""
+  clearImageTitle()
+  hideDomElements();
   hideEditLogoutButtons();
   showLoginSignupButtons();
   showLoginForm();
-  hideEditForm();
-  if (!DOM.canvasContainer.hidden) {
-    toggleCanvasHidden();
-  }
 }
 
 function showLoginForm(e) {
@@ -305,10 +308,15 @@ DOM.imageTitle.addEventListener('input', selectTitleInput)
 
 // UI FUNCTIONS
 function hideDomElements() {
-  DOM.images.innerHTML = "";
+  clearChildren(DOM.images);
+  clearImageTitle()
   DOM.canvasContainer.hidden = true;
   DOM.editForm.hidden = true;
-  
+}
+
+function clearImageTitle() {
+  STATE.imageTitle = "";
+  DOM.imageTitle.value = STATE.imageTitle;
 }
 
 function showFormError(message="wrong username or password") {
@@ -343,6 +351,12 @@ function hideEditLogoutButtons() {
   DOM.logoutButton.hidden = true;
 }
 
+function showCanvasMessage(message) {
+  DOM.canvasMessageP.textContent = message;
+  DOM.canvasMessage.hidden = false;
+  setTimeout(() => DOM.canvasMessage.hidden = true, 2000);
+}
+
 function myDoodleFunc(e) {
   if (!STATE.userID) {
     alert('You must be logged in to view your Doodles!')
@@ -350,9 +364,7 @@ function myDoodleFunc(e) {
     if (!DOM.canvasContainer.hidden) {
       userResponse = confirm("All unsaved work will be lost.")
       if (userResponse) {
-        STATE.imageTitle = "";
-        DOM.imageTitle.value = STATE.imageTitle;
-        // HIDE CANVAS
+        clearImageTitle()
         clearCanvas();
         toggleCanvasHidden();
       } else return
@@ -366,7 +378,7 @@ function fetchAndShowUserWorks() {
   fetch(`http://localhost:3000/users/${STATE.userID}`)
     .then(res => res.json())
     .then(user => {
-      DOM.images.innerHTML = "";
+      clearChildren(DOM.images);
       user.images.forEach(image => displayArt(image));
     });
 }
@@ -416,7 +428,7 @@ function onMouseMove(e) {
   switch(STATE.activeTool) {
     case TOOLS.line:
     case TOOLS.rectangle:
-    case TOOLS.ellipse:
+    case TOOLS.circle:
     case TOOLS.triangle:
     case TOOLS.star:
     case TOOLS.ellipse_real:
@@ -472,12 +484,12 @@ function drawShape() {
     ctx.moveTo(startPos.x, startPos.y);
     ctx.lineTo(currentPos.x, currentPos.y);
   } else if (STATE.activeTool == TOOLS.rectangle) {
-      const rect_width = currentPos.x - startPos.x;
-      const rect_height = currentPos.y - startPos.y;
-      ctx.rect(startPos.x, startPos.y, rect_width, rect_height);
-  } else if (STATE.activeTool == TOOLS.ellipse) {
-      const radius = getRadius(startPos, currentPos);
-      ctx.arc(startPos.x, startPos.y, radius, 0, Math.PI * 2, false);
+    const rect_width = currentPos.x - startPos.x;
+    const rect_height = currentPos.y - startPos.y;
+    ctx.rect(startPos.x, startPos.y, rect_width, rect_height);
+  } else if (STATE.activeTool == TOOLS.circle) {
+    const radius = getRadius(startPos, currentPos);
+    ctx.arc(startPos.x, startPos.y, radius, 0, Math.PI * 2, false);
   } else if (STATE.activeTool == TOOLS.triangle) {
       ctx.moveTo(startPos.x + (currentPos.x - startPos.x) / 2, startPos.y);
       ctx.lineTo(startPos.x, currentPos.y);
@@ -628,7 +640,7 @@ function saveCanvas() {
   if (!STATE.userID) {
     alert('Please log in or sign up to begin Doodling!')
     return
-  } 
+  }
   let dataURL = DOM.canvas.toDataURL()
   let imageObj = {
       image: {
@@ -657,6 +669,7 @@ function clearCanvas() {
   ctx.clearRect(0, 0, 700, 500)
   savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
   STATE.undo.push(savedData)
+  showCanvasMessage('Cleared')
 }
 
 function downloadCanvas() {
@@ -664,6 +677,9 @@ function downloadCanvas() {
     alert('Please log in or sign up to begin Doodling!')
     return
   } 
+  if (DOM.canvasContainer.hidden === true) {
+    return
+  }
   let tempLink = document.createElement('a')
   tempLink.href = DOM.canvas.toDataURL()
   tempLink.download = ''
@@ -699,15 +715,15 @@ function createFigureElement(image) {
 
 function displayImageOnCanvas(imageObj) {
   return function() {
-    STATE.imageTitle = imageObj.title
-    DOM.images.innerHTML = ""
-    DOM.imageTitle.value = STATE.imageTitle
-    toggleCanvasHidden()
-    ctx.drawImage(this, 0, 0)
+    STATE.imageTitle = imageObj.title;
+    clearChildren(DOM.images);
+    DOM.imageTitle.value = STATE.imageTitle;
+    toggleCanvasHidden();
+    ctx.drawImage(this, 0, 0);
     savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
-    STATE.undo.length = 0
-    STATE.undo.push(savedData)
-    STATE.canvasID = imageObj.id
+    STATE.undo.length = 0;
+    STATE.undo.push(savedData);
+    STATE.canvasID = imageObj.id;
   }
 }
 
@@ -780,6 +796,14 @@ function renderTextOptions() {
   DOM.toolOptions.append(renderToolHeader(), renderShapeFillOptions(), textOptions)
 }
 
+// REMOVE DOM ELEMENTS
+function clearChildren(element) {
+  let children = Array.from(element.children);
+  children.forEach(child => {
+    child.remove();
+  });
+}
+
 // CHANGE STATE FUNCTIONS
 function changeShapeFill() {
   if (STATE.activeTool === 'text') {
@@ -842,7 +866,7 @@ function updateCanvas(imageObj) {
       body: JSON.stringify(imageObj)
   })
   .then(resp => resp.json())
-  .then(data => console.log(data))
+  .then(imageData => showCanvasMessage(`Saved`))
 }
 
 function postCanvas(imageObj) {
@@ -854,7 +878,10 @@ function postCanvas(imageObj) {
       body: JSON.stringify(imageObj)
   })
   .then(resp => resp.json())
-  .then(data => console.log(data))
+  .then(imageData => {
+    STATE.canvasID = imageData.id
+    showCanvasMessage(`Saved`)
+  })
 }
 
 // KEYBOARD EVENT LISTENERS
