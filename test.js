@@ -41,6 +41,8 @@ const TEMPLATE = {
   strokeOpacityOptions: document.querySelector('template#stroke-opacity-options-template'),
   shapeFillOptions: document.querySelector('template#shape-fill-options-template'),
   textOptions: document.querySelector('template#text-options-template'),
+  starPointsOptions: document.querySelector('template#star-points-options-template'),
+  innerRadiusOptions: document.querySelector('template#inner-radius-options-template'),
 }
 
 const baseURL = "http://localhost:3000";
@@ -55,12 +57,11 @@ const TOOLS = {
   ellipse: 'ellipse',
   circle: 'circle',
   star: 'star',
+  polygon: 'polygon',
   triangle: 'triangle',
   brush: 'brush',
   eraser: 'eraser',
   text: 'text',
-  star: 'star',
-  ellipse_real: 'ellipse_real',
 }
 
 const STATE = {
@@ -81,6 +82,12 @@ const STATE = {
     width: 5,
     opacity: 1,
     shapeFill: 'outline',
+  },
+  star: {
+    points: 5,
+  },
+  polygon: {
+    innerRadius: 100, 
   },
   text: {
     drawTextInput: "",
@@ -123,6 +130,7 @@ function renderOptions() {
     case TOOLS.triangle:
     case TOOLS.ellipse:
     case TOOLS.star:
+    case TOOLS.polygon:
       renderShapeOptions();
       break;
     case TOOLS.brush:
@@ -431,7 +439,8 @@ function onMouseMove(e) {
     case TOOLS.circle:
     case TOOLS.triangle:
     case TOOLS.star:
-    case TOOLS.ellipse_real:
+    case TOOLS.polygon:
+    case TOOLS.ellipse:
       drawShape();
       break;
     case TOOLS.brush:
@@ -499,7 +508,7 @@ function drawShape() {
       const centerX = currentPos.x;
       const centerY = currentPos.y;
 
-      const points = 5; // user can vary this using sliders
+      const points = STATE.star.points; // user can vary this using sliders
       const outerRadius = getPythagoreanDistance(startPos, currentPos);
       const innerRadius = Math.round(outerRadius / 2);
 
@@ -512,7 +521,25 @@ function drawShape() {
       };
 
       ctx.closePath();
-  } else if (STATE.activeTool == TOOLS.ellipse_real) {
+  } else if (STATE.activeTool == TOOLS.polygon) {
+      console.log('hi')
+      const centerX = currentPos.x;
+      const centerY = currentPos.y;
+
+      const points = 5;
+      const outerRadius = getPythagoreanDistance(startPos, currentPos);
+      const innerRadius = STATE.polygon.innerRadius;
+
+      ctx.moveTo(centerX, centerY+outerRadius);
+
+      for (let i=0; i < 2*points+1; i++) {
+          const r = (i%2 == 0)? outerRadius : innerRadius;
+          const a = Math.PI * i/points;
+          ctx.lineTo(centerX + r*Math.sin(a), centerY + r*Math.cos(a));
+      };
+
+      ctx.closePath();
+  } else if (STATE.activeTool == TOOLS.ellipse) {
       const a = Math.abs(currentPos.x - startPos.x);
       const b = Math.abs(currentPos.y - startPos.y);
       ctx.ellipse(startPos.x, startPos.y, a, b, Math.PI, 0, Math.PI * 2);
@@ -753,6 +780,12 @@ function renderBrushOptions() {
 
 function renderShapeOptions() {
   DOM.toolOptions.append(renderToolHeader(), renderBlendOptions(), renderShapeFillOptions(), renderSizeOptions(), renderOpacityOptions())
+  if (STATE.activeTool === "star") {
+    DOM.toolOptions.append(renderStarPointsOptions())
+  }
+  if (STATE.activeTool === 'polygon') {
+    DOM.toolOptions.append(renderInnerRadiusOptions())
+  }
 }
 
 function renderEraserOptions() {
@@ -816,6 +849,26 @@ function renderTextOptions() {
   DOM.toolOptions.append(renderToolHeader(), renderShapeFillOptions(), textOptions)
 }
 
+function renderStarPointsOptions() {
+  const starPointsOptions = TEMPLATE.starPointsOptions.cloneNode(true).content.querySelector('div#star-points-options')
+  const starPointsInputs = starPointsOptions.querySelectorAll('input')
+  starPointsInputs.forEach((input) => {
+    input.value = STATE.star.points
+    input.addEventListener('input', changeStarPoints)
+  })
+  return starPointsOptions
+}
+
+function renderInnerRadiusOptions() {
+  const innerRadiusOptions = TEMPLATE.innerRadiusOptions.cloneNode(true).content.querySelector('div#inner-radius-options')
+  const innerRadiusInputs = innerRadiusOptions.querySelectorAll('input')
+  innerRadiusInputs.forEach((input) => {
+    input.value = STATE.polygon.innerRadius
+    input.addEventListener('input', changeInnerRadius)
+  })
+  return innerRadiusOptions
+}
+
 // REMOVE DOM ELEMENTS
 function clearChildren(element) {
   let children = Array.from(element.children);
@@ -872,6 +925,18 @@ function changeFontFamily() {
 
 function changeFontSize() {
   STATE.text.ctxFontSize = this.value
+}
+
+function changeStarPoints() {
+  isLegitValue(this, 1, 100)
+  this.id === "star-points-slider" ? this.nextElementSibling.value = this.value : this.previousElementSibling.value = this.value
+  STATE.star.points = this.value
+}
+
+function changeInnerRadius() {
+  isLegitValue(this, 1, 100)
+  this.id === "inner-radius-slider" ? this.nextElementSibling.value = this.value : this.previousElementSibling.value = this.value
+  STATE.polygon.innerRadius = this.value
 }
 
 

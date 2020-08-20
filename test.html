@@ -78,6 +78,7 @@
                             <div class="flexitem" data-tool="triangle" title="triangle">▲</div>
                             <div class="flexitem" data-tool="ellipse" title="ellipse">⬬</div>
                             <div class="flexitem" data-tool="star" title="star"><i class="fas fa-star"></i></div>
+                            <div class="flexitem" data-tool="polygon" title="polygon"><i class="fas fa-certificate"></i></div>
                             <div class="flexitem activetool" data-tool="brush" title="brush"><i class="fas fa-paint-brush"></i></div>
                             <div class="flexitem" data-tool="eraser" title="eraser"><i class="fas fa-eraser"></i></div>
                             <div class="flexitem" data-tool="bucket" title="paint bucket"><i class="fas fa-fill-drip"></i></div>
@@ -86,8 +87,14 @@
 
                         <div class="tools d-flex flex-wrap justify-content-around">
                             <div id="stroke-color-options" class="color-picker justify-content-center">
+                              <!-- <div> -->
+                                <!-- <label for="stroke-color-input">Stroke</label> -->
                                 <input type="color" title="stroke color" class="color-input" id="stroke-color-input">
+                              <!-- </div>
+                              <div> -->
+                                <!-- <label for="fill-color-input">Fill</label> -->
                                 <input type="color" title="fill color" value="#FFFFFF"class="color-input" id="fill-color-input">
+                              <!-- </div> -->
                             </div>
                         </div>
                     </div>
@@ -153,7 +160,7 @@
                     <div id="stroke-size-options" class="stroke-options">
                       <label for="stroke-size">Size</label><br>
                       <input type="range" min="1" max="100" value="5" id="stroke-size-slider">
-                      <input type="number" min="0" max="75" value="5" onClick="this.select();" class="btn option-input" id="stroke-size-input">
+                      <input type="number" min="0" max="100" value="5" onClick="this.select();" class="btn option-input" id="stroke-size-input">
                       <span>px</span>
                     </div>
                   </template>
@@ -163,6 +170,20 @@
                       <input type="range" min="0" max="100" value="100" name="opacity"id="stroke-opacity-slider">
                       <input type="number" min="0" max="100" value="100" onClick="this.select();" class="btn option-input" id="stroke-opacity-input">
                       <span>%</span>
+                    </div>
+                  </template>
+                  <template id="star-points-options-template">
+                    <div id="star-points-options" class="stroke-options">
+                      <label for="star-points">Points</label><br>
+                      <input type="range" min="1" max="100" value="5" id="star-points-slider">
+                      <input type="number" min="0" max="100" value="5" onClick="this.select();" class="btn option-input" id="star-points-input">
+                    </div>
+                  </template>
+                  <template id="inner-radius-options-template">
+                    <div id="inner-radius-options" class="stroke-options">
+                      <label for="inner-radius">Inner Radius</label><br>
+                      <input type="range" min="1" max="100" value="50" id="inner-radius-slider">
+                      <input type="number" min="0" max="100" value="50" onClick="this.select();" class="btn option-input" id="inner-radius-input">
                     </div>
                   </template>
                 </div>

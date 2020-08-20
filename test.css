@@ -73,9 +73,9 @@ nav {
 }
 
 .tools {
-    margin-bottom: 15px !important;
     height: auto;
 }
+
 #tool-options-container {
     min-height: auto;
     min-width: auto;
@@ -141,7 +141,16 @@ nav {
 .color-picker {
     width: 100%;
     display: flex;
+    margin: 0 10px 10px 10px;
 }
+
+/* #stroke-color-input {
+
+}
+
+#fill-color-input {
+
+} */
 
 input.color-input {
     display: block;
