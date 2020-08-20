@@ -55,6 +55,8 @@ const TOOLS = {
   brush: 'brush',
   eraser: 'eraser',
   text: 'text',
+  star: 'star',
+  ellipse_real: 'ellipse_real',
 }
 
 const STATE = {
@@ -416,6 +418,8 @@ function onMouseMove(e) {
     case TOOLS.rectangle:
     case TOOLS.ellipse:
     case TOOLS.triangle:
+    case TOOLS.star:
+    case TOOLS.ellipse_real:
       drawShape();
       break;
     case TOOLS.brush:
@@ -468,18 +472,40 @@ function drawShape() {
     ctx.moveTo(startPos.x, startPos.y);
     ctx.lineTo(currentPos.x, currentPos.y);
   } else if (STATE.activeTool == TOOLS.rectangle) {
-    const rect_width = currentPos.x - startPos.x;
-    const rect_height = currentPos.y - startPos.y;
-    ctx.rect(startPos.x, startPos.y, rect_width, rect_height);
+      const rect_width = currentPos.x - startPos.x;
+      const rect_height = currentPos.y - startPos.y;
+      ctx.rect(startPos.x, startPos.y, rect_width, rect_height);
   } else if (STATE.activeTool == TOOLS.ellipse) {
-    const radius = getRadius(startPos, currentPos);
-    ctx.arc(startPos.x, startPos.y, radius, 0, Math.PI * 2, false);
+      const radius = getRadius(startPos, currentPos);
+      ctx.arc(startPos.x, startPos.y, radius, 0, Math.PI * 2, false);
   } else if (STATE.activeTool == TOOLS.triangle) {
-    ctx.moveTo(startPos.x + (currentPos.x - startPos.x) / 2, startPos.y);
-    ctx.lineTo(startPos.x, currentPos.y);
-    ctx.lineTo(currentPos.x, currentPos.y);
-    ctx.closePath();
+      ctx.moveTo(startPos.x + (currentPos.x - startPos.x) / 2, startPos.y);
+      ctx.lineTo(startPos.x, currentPos.y);
+      ctx.lineTo(currentPos.x, currentPos.y);
+      ctx.closePath();
+  } else if (STATE.activeTool == TOOLS.star) {
+      const centerX = currentPos.x;
+      const centerY = currentPos.y;
+
+      const points = 5; // user can vary this using sliders
+      const outerRadius = getPythagoreanDistance(startPos, currentPos);
+      const innerRadius = Math.round(outerRadius / 2);
+
+      ctx.moveTo(centerX, centerY+outerRadius);
+
+      for (let i=0; i < 2*points+1; i++) {
+          const r = (i%2 == 0)? outerRadius : innerRadius;
+          const a = Math.PI * i/points;
+          ctx.lineTo(centerX + r*Math.sin(a), centerY + r*Math.cos(a));
+      };
+
+      ctx.closePath();
+  } else if (STATE.activeTool == TOOLS.ellipse_real) {
+      const a = Math.abs(currentPos.x - startPos.x);
+      const b = Math.abs(currentPos.y - startPos.y);
+      ctx.ellipse(startPos.x, startPos.y, a, b, Math.PI, 0, Math.PI * 2);
   }
+
   switch (STATE.stroke.shapeFill) {
     case "outline":
       break;
@@ -558,6 +584,13 @@ function getRadius(coord1, coord2) {
   const xPow = Math.pow(coord2.x - coord1.x, 2);
   const yPow = Math.pow(coord2.y - coord1.y, 2);
   return Math.sqrt(xPow + yPow);
+}
+
+function getPythagoreanDistance(coords1, coords2) {
+  const a = Math.abs(coords2.x) - Math.abs(coords1.x);
+  const b = Math.abs(coords2.y) - Math.abs(coords1.y);
+  const c = Math.sqrt(a ** 2 + b ** 2);
+  return c;
 }
 
 function clearCanvasStates() {
