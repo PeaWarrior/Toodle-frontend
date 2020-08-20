@@ -302,10 +302,14 @@ DOM.imageTitle.addEventListener('input', selectTitleInput)
 // UI FUNCTIONS
 function hideDomElements() {
   clearChildren(DOM.images);
-  STATE.imageTitle = "";
-  DOM.imageTitle = STATE.imageTitle;
+  clearImageTitle()
   DOM.canvasContainer.hidden = true;
   DOM.editForm.hidden = true;
+}
+
+function clearImageTitle() {
+  STATE.imageTitle = "";
+  DOM.imageTitle.value = STATE.imageTitle;
 }
 
 function showFormError(message="wrong username or password") {
@@ -347,8 +351,7 @@ function myDoodleFunc(e) {
     if (!DOM.canvasContainer.hidden) {
       userResponse = confirm("All unsaved work will be lost.")
       if (userResponse) {
-        STATE.imageTitle = "";
-        DOM.imageTitle.value = STATE.imageTitle;
+        clearImageTitle()
         // HIDE CANVAS
         clearCanvas();
         toggleCanvasHidden();
