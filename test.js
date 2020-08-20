@@ -5,7 +5,22 @@ const DOM = {
   imageTitle: document.querySelector('#image-title'),
   myDoodle: document.querySelector('#my-doodles'),
   form: document.querySelector('#form'),
+  formUsername: document.querySelector('#username'),
+  formPassword: document.querySelector('#password'),
+  formConfirmPassword: document.querySelector('#confirm-password'),
   formButton: document.querySelector('#form-submit'),
+  editForm: document.querySelector('#form-edit'),
+  editFormUsername: document.querySelector('#username-edit'),
+  editFormPassword: document.querySelector('#password-edit'),
+  editFormConfirmPassword: document.querySelector('#confirm-password-edit'),
+  formError: document.querySelector('#form-error'),
+  formErrorP: document.querySelector('#form-error p'),
+  formSuccess: document.querySelector('#form-success'),
+  formSuccessP: document.querySelector('#form-success p'),
+  loginButton: document.querySelector('#login-btn'),
+  signupButton: document.querySelector('#signup-btn'),
+  editProfileButton: document.querySelector('#edit-profile-btn'),
+  logoutButton: document.querySelector('#logout-btn'),
   newButton: document.querySelector('div[data-command="new"]'),
   downloadButton: document.querySelector('div[data-command="download"]'),
   saveButton: document.querySelector('div[data-command="save"]'),
@@ -49,6 +64,7 @@ const STATE = {
   startPos: {x: 0, y: 0},
   currentPos: {x: 0, y: 0},
   userID: 1,
+  username: "",
   imageTitle: "",
   canvasID: null,
   stroke: {
@@ -112,9 +128,78 @@ function renderOptions() {
   }
 }
 
+// UI EVENT LISTENERS
 DOM.myDoodle.addEventListener('click', myDoodleFunc);
-
 DOM.form.addEventListener('submit', authenticate);
+DOM.loginButton.addEventListener('click', showLoginForm);
+DOM.signupButton.addEventListener('click', showSignupForm);
+DOM.editForm.addEventListener('submit', patchUser);
+DOM.editProfileButton.addEventListener('click', toggleEditForm);
+DOM.logoutButton.addEventListener('click', logout);
+
+function patchUser(e) {
+  e.preventDefault();
+  
+  const username = DOM.editFormUsername || STATE.username;
+
+  const patchConfig = {
+    method: "PATCH",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      user: {
+        username: username
+      }
+    })
+  }
+
+  fetch(`http://localhost:3000/users/${STATE.userID}`, patchConfig)
+    .then(res => res.json())
+    .then(user => {
+      showFormSuccess(`username successfully updated to ${user.username}`);
+
+    })
+
+  DOM.editForm.reset();
+}
+
+function logout() {
+  STATE.userID = "";
+  STATE.username = "";
+  hideEditLogoutButtons();
+  showLoginSignupButtons();
+  showLoginForm();
+  hideEditForm();
+  toggleCanvasHidden();
+}
+
+function showLoginForm(e) {
+  DOM.formButton.value = "login";
+  DOM.formButton.textContent = "Login";
+  DOM.form.hidden = false;
+  DOM.formConfirmPassword.parentElement.hidden = true;
+}
+
+function showSignupForm(e) {
+  DOM.formButton.value = "signup";
+  DOM.formButton.textContent = "Sign Up";
+  DOM.formConfirmPassword.parentElement.hidden = false;
+}
+
+function showEditForm(e) {
+  DOM.editFormUsername.value = STATE.username;
+  DOM.editForm.hidden = false;
+}
+
+function hideEditForm(e) {
+  DOM.editForm.hidden = true;
+}
+
+function toggleEditForm(e) {
+  DOM.editFormUsername.value = STATE.username;
+  DOM.editForm.hidden = !DOM.editForm.hidden;
+}
 
 function authenticate(e) {
   e.preventDefault();
@@ -126,14 +211,23 @@ function authenticate(e) {
 
   if (submitValue == "login") {
     login(username, password);
-  } else {
+  } else if (submitValue == "signup") {
     signup(username, password);
+  } else {
+    return;
   }
 
   form.reset();
 }
 
 function signup(username, password) {
+  const confirmPassword = DOM.formConfirmPassword.value;
+
+  if (confirmPassword != password) {
+    showFormError("passwords don't match");
+    return;
+  }
+
   const postConfig = {
     method: "POST",
     headers: {
@@ -149,8 +243,17 @@ function signup(username, password) {
 
   fetch('http://localhost:3000/signup', postConfig)
     .then(res => res.json())
-    .then(user => console.log(user))
-    .catch(err => console.log(err));
+    .then(user => {
+      STATE.userID = user.id;
+      STATE.username = user.username;
+      hideLoginSignupButtons();
+      showEditLogoutButtons();
+      DOM.form.hidden = true;
+      toggleCanvasHidden();
+    })
+    .catch(err => {
+      showFormError("username is taken");
+    });
 }
 
 function login(username, password) {
@@ -169,13 +272,54 @@ function login(username, password) {
 
   fetch('http://localhost:3000/login', postConfig)
     .then(res => res.json())
-    .then(user => STATE.userID = user.id)
-    .catch(err => console.log(err));
+    .then(user => {
+      STATE.userID = user.id;
+      STATE.username = user.username;
+      hideLoginSignupButtons();
+      showEditLogoutButtons();
+      DOM.form.hidden = true;
+      toggleCanvasHidden();
+    })
+    .catch(err => {
+      showFormError("password doesn't match");
+    });
 }
 
 DOM.imageTitle.addEventListener('input', selectTitleInput)
 
 // UI FUNCTIONS
+function showFormError(message="wrong username or password") {
+  DOM.formErrorP.textContent = message;
+  DOM.formError.hidden = false;
+  setTimeout(() => DOM.formError.hidden = true, 2000);
+}
+
+function showFormSuccess(message) {
+  DOM.formSuccessP.textContent = message;
+  DOM.formSuccess.hidden = false;
+  setTimeout(() => DOM.formSuccess.hidden = true, 2000);
+}
+
+function showLoginSignupButtons() {
+  DOM.loginButton.hidden = false;
+  DOM.signupButton.hidden = false;
+}
+
+function hideLoginSignupButtons() {
+  DOM.loginButton.hidden = true;
+  DOM.signupButton.hidden = true;
+}
+
+function showEditLogoutButtons() {
+  DOM.editProfileButton.hidden = false;
+  DOM.logoutButton.hidden = false;
+}
+
+function hideEditLogoutButtons() {
+  DOM.editProfileButton.hidden = true;
+  DOM.logoutButton.hidden = true;
+}
+
 function myDoodleFunc(e) {
   userResponse = confirm("All unsaved work will be lost.")
   if (userResponse) {
