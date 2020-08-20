@@ -36,6 +36,10 @@ nav {
     border-bottom: 1px solid #775144;
 }
 
+.container-fluid {
+    padding: 0 !important;
+}
+
 #my-doodles {
     color: #106381;
 }
@@ -55,21 +59,30 @@ nav {
 }
 
 .columns {
-    height: 90vh;
+    min-height: 90vh;
+    min-width: 89vw;
 }
 
 .sidebar-left {
     background-color: #fff2bb;
     border-right: 1px solid #5c80bc;
     border-bottom: 1px solid #5c80bc;
+    width: 13%;
+    margin: 0;
+    height: auto;
 }
 
 #tools {
     border-bottom: 1px solid #7e7f9a;
+    height: auto;
 }
-
+#tool-options-container {
+    min-height: auto;
+    min-width: auto;
+}
 #tool-options {
     background-color: #fff2bb;
+    width: auto;
 }
 
 .option-input {
@@ -92,16 +105,18 @@ nav {
 #text-font-size {
     padding: 0 !important;
     width: 3em;
-    margin-left: 0;
+    margin-top: 5px;
+    height: 30px;
 }
 
 .commands, .tools {
-    margin: 5px 0;
-    padding: 5px 15px;
+    width: 100%;
+    padding: 5px 10%;
 }
 
 .flexitem {
-    width: 30%;
+    width: 50px;
+    height: 40px;
     padding: 5px 0;
     margin: 5px;
     border: 2px solid #FDA049;
@@ -130,8 +145,8 @@ nav {
 
 input.color-input {
     display: block;
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 55px;
     padding: 0;
     background: transparent;
     border: 1px grey solid;
