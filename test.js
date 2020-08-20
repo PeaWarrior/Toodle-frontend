@@ -779,8 +779,11 @@ function renderBrushOptions() {
 }
 
 function renderShapeOptions() {
-  DOM.toolOptions.append(renderToolHeader(), renderBlendOptions(), renderShapeFillOptions(), renderSizeOptions(), renderOpacityOptions())
-  if (STATE.activeTool === "star") {
+  DOM.toolOptions.append(renderToolHeader(), renderBlendOptions(), renderShapeFillOptions(), renderSizeOptions())
+  if (STATE.activeTool !== 'polygon') {
+    DOM.toolOptions.append(renderOpacityOptions())
+  }
+  if (STATE.activeTool === "star" || STATE.activeTool === 'polygon') {
     DOM.toolOptions.append(renderStarPointsOptions())
   }
   if (STATE.activeTool === 'polygon') {
