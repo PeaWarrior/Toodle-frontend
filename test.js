@@ -184,6 +184,8 @@ function patchUser(e) {
 function logout() {
   STATE.userID = "";
   STATE.username = "";
+  clearCanvas()
+  clearCanvasStates()
   clearImageTitle()
   hideDomElements();
   hideEditLogoutButtons();
@@ -522,11 +524,10 @@ function drawShape() {
 
       ctx.closePath();
   } else if (STATE.activeTool == TOOLS.polygon) {
-      console.log('hi')
       const centerX = currentPos.x;
       const centerY = currentPos.y;
 
-      const points = 5;
+      const points = STATE.star.points;
       const outerRadius = getPythagoreanDistance(startPos, currentPos);
       const innerRadius = STATE.polygon.innerRadius;
 
