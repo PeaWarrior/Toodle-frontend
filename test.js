@@ -63,7 +63,7 @@ const STATE = {
   redo: [],
   startPos: {x: 0, y: 0},
   currentPos: {x: 0, y: 0},
-  userID: 1,
+  userID: null,
   username: "",
   imageTitle: "",
   canvasID: null,
@@ -168,11 +168,14 @@ function patchUser(e) {
 function logout() {
   STATE.userID = "";
   STATE.username = "";
+  DOM.images.innerHTML = ""
   hideEditLogoutButtons();
   showLoginSignupButtons();
   showLoginForm();
   hideEditForm();
-  toggleCanvasHidden();
+  if (!DOM.canvasContainer.hidden) {
+    toggleCanvasHidden();
+  }
 }
 
 function showLoginForm(e) {
@@ -198,6 +201,7 @@ function hideEditForm(e) {
 }
 
 function toggleEditForm(e) {
+  hideDomElements()
   DOM.editFormUsername.value = STATE.username;
   DOM.editForm.hidden = !DOM.editForm.hidden;
 }
@@ -245,12 +249,16 @@ function signup(username, password) {
   fetch('http://localhost:3000/signup', postConfig)
     .then(res => res.json())
     .then(user => {
-      STATE.userID = user.id;
-      STATE.username = user.username;
-      hideLoginSignupButtons();
-      showEditLogoutButtons();
-      DOM.form.hidden = true;
-      toggleCanvasHidden();
+      if (user.status !== 200 && user.status !== 201) {
+        throw new Error("Bad response from server")
+      } else {
+        STATE.userID = user.id;
+        STATE.username = user.username;
+        hideLoginSignupButtons();
+        showEditLogoutButtons();
+        DOM.form.hidden = true;
+        toggleCanvasHidden();
+      }
     })
     .catch(err => {
       showFormError("username is taken");
@@ -274,19 +282,33 @@ function login(username, password) {
   fetch('http://localhost:3000/login', postConfig)
     .then(res => res.json())
     .then(user => {
-      STATE.userID = user.id;
-      STATE.username = user.username;
-      hideLoginSignupButtons();
-      showEditLogoutButtons();
-      DOM.form.hidden = true;
-      toggleCanvasHidden();
+      if (user.status !== 200 && user.status !== 201) {
+        throw new Error("Bad response from server")
+      } else {
+        STATE.userID = user.id;
+        STATE.username = user.username;
+        hideLoginSignupButtons();
+        showEditLogoutButtons();
+        DOM.form.hidden = true;
+        DOM.imageTitle.value = 'Untitled'
+        toggleCanvasHidden();
+      }
     })
     .catch(err => {
       showFormError("password doesn't match");
     });
 }
 
+DOM.imageTitle.addEventListener('input', selectTitleInput)
+
 // UI FUNCTIONS
+function hideDomElements() {
+  DOM.images.innerHTML = "";
+  DOM.canvasContainer.hidden = true;
+  DOM.editForm.hidden = true;
+  
+}
+
 function showFormError(message="wrong username or password") {
   DOM.formErrorP.textContent = message;
   DOM.formError.hidden = false;
@@ -320,13 +342,20 @@ function hideEditLogoutButtons() {
 }
 
 function myDoodleFunc(e) {
-  userResponse = confirm("All unsaved work will be lost.")
-  if (userResponse) {
-    STATE.imageTitle = "";
-    DOM.imageTitle.textContent = STATE.imageTitle;
-    // HIDE CANVAS
-    clearCanvas();
-    toggleCanvasHidden();
+  if (!STATE.userID) {
+    alert('You must be logged in to view your Doodles!')
+  } else {
+    if (!DOM.canvasContainer.hidden) {
+      userResponse = confirm("All unsaved work will be lost.")
+      if (userResponse) {
+        STATE.imageTitle = "";
+        DOM.imageTitle.value = STATE.imageTitle;
+        // HIDE CANVAS
+        clearCanvas();
+        toggleCanvasHidden();
+      } else return
+    }
+    hideDomElements()
     fetchAndShowUserWorks();
   }
 }
@@ -343,6 +372,10 @@ function fetchAndShowUserWorks() {
 function displayArt(image) {
   const figureElement = createFigureElement(image);
   DOM.images.append(figureElement);
+}
+
+function selectTitleInput() {
+  STATE.imageTitle = this.value
 }
 
 // EVENT FUNCTIONS
@@ -534,7 +567,7 @@ function clearCanvasStates() {
 
 function promptAndSetImageTitle() {
   STATE.imageTitle = prompt("Please enter a title (PG-13)");
-  DOM.imageTitle.textContent = STATE.imageTitle || "Untitled";
+  DOM.imageTitle.value = STATE.imageTitle || "Untitled";
 }
 
 function toggleCanvasHidden() {
@@ -559,22 +592,32 @@ DOM.saveButton.addEventListener('click', saveCanvas)
 
 // COMMAND FUNCTIONS
 function saveCanvas() {
-    let dataURL = DOM.canvas.toDataURL()
-    let imageObj = {
-        image: {
-            user_id: `${STATE.userID}`,
-            title: "cool",
-            art: dataURL
-        }
-    }
-    !!STATE.canvasID ? updateCanvas(imageObj) : postCanvas(imageObj)
+  if (!STATE.userID) {
+    alert('Please log in or sign up to begin Doodling!')
+    return
+  } 
+  let dataURL = DOM.canvas.toDataURL()
+  let imageObj = {
+      image: {
+          user_id: `${STATE.userID}`,
+          title: DOM.imageTitle.value,
+          art: dataURL
+      }
+  }
+  !!STATE.canvasID ? updateCanvas(imageObj) : postCanvas(imageObj)
 }
 
 function newCanvas() {
-  STATE.canvasID = null;
-  promptAndSetImageTitle();
-  clearCanvasStates();
-  toggleCanvasHidden();
+  if (!!STATE.userID) {
+    hideDomElements()
+    ctx.clearRect(0, 0, DOM.canvas.width, DOM.canvas.height)
+    STATE.canvasID = null;
+    promptAndSetImageTitle();
+    clearCanvasStates();
+    toggleCanvasHidden();
+  } else {
+    alert('Please log in or sign up to start Doodling!')
+  }
 }
 
 function clearCanvas() {
@@ -584,6 +627,10 @@ function clearCanvas() {
 }
 
 function downloadCanvas() {
+  if (!STATE.userID) {
+    alert('Please log in or sign up to begin Doodling!')
+    return
+  } 
   let tempLink = document.createElement('a')
   tempLink.href = DOM.canvas.toDataURL()
   tempLink.download = ''
@@ -613,18 +660,21 @@ function createFigureElement(image) {
   const figcaption = document.createElement('figcaption');
     figcaption.textContent = `${image.title}`;
   figure.append(img, figcaption);
-
-  img.addEventListener('click', displayImageOnCanvas(image.id))
+  img.addEventListener('click', displayImageOnCanvas(image))
   return figure;
 }
 
-function displayImageOnCanvas(imageID) {
+function displayImageOnCanvas(imageObj) {
   return function() {
+    STATE.imageTitle = imageObj.title
+    DOM.images.innerHTML = ""
+    DOM.imageTitle.value = STATE.imageTitle
+    toggleCanvasHidden()
     ctx.drawImage(this, 0, 0)
     savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
     STATE.undo.length = 0
     STATE.undo.push(savedData)
-    STATE.canvasID = imageID
+    STATE.canvasID = imageObj.id
   }
 }
 
@@ -762,7 +812,7 @@ function updateCanvas(imageObj) {
   .then(data => console.log(data))
 }
 
-function postCanvas() {
+function postCanvas(imageObj) {
   fetch(`http://localhost:3000/images/`, {
       method: 'POST',
       headers: {
