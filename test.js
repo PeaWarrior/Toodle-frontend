@@ -105,8 +105,8 @@ function toggleActiveTool() {
   document.querySelector("[data-tool].activetool").classList.toggle("activetool");
   this.classList.toggle("activetool");
   STATE.activeTool = document.querySelector("[data-tool].activetool").dataset["tool"];
-  DOM.toolOptions.innerHTML = ""
-  renderOptions()
+  clearChildren(DOM.toolOptions);
+  renderOptions();
 }
 
 function renderOptions() {
@@ -168,14 +168,12 @@ function patchUser(e) {
 function logout() {
   STATE.userID = "";
   STATE.username = "";
-  DOM.images.innerHTML = ""
+  STATE.imageTitle = ""
+  DOM.imageTitle.value = STATE.imageTitle
+  hideDomElements();
   hideEditLogoutButtons();
   showLoginSignupButtons();
   showLoginForm();
-  hideEditForm();
-  if (!DOM.canvasContainer.hidden) {
-    toggleCanvasHidden();
-  }
 }
 
 function showLoginForm(e) {
@@ -303,10 +301,11 @@ DOM.imageTitle.addEventListener('input', selectTitleInput)
 
 // UI FUNCTIONS
 function hideDomElements() {
-  DOM.images.innerHTML = "";
+  clearChildren(DOM.images);
+  STATE.imageTitle = "";
+  DOM.imageTitle = STATE.imageTitle;
   DOM.canvasContainer.hidden = true;
   DOM.editForm.hidden = true;
-  
 }
 
 function showFormError(message="wrong username or password") {
@@ -364,7 +363,7 @@ function fetchAndShowUserWorks() {
   fetch(`http://localhost:3000/users/${STATE.userID}`)
     .then(res => res.json())
     .then(user => {
-      DOM.images.innerHTML = "";
+      clearChildren(DOM.images);
       user.images.forEach(image => displayArt(image));
     });
 }
@@ -666,15 +665,15 @@ function createFigureElement(image) {
 
 function displayImageOnCanvas(imageObj) {
   return function() {
-    STATE.imageTitle = imageObj.title
-    DOM.images.innerHTML = ""
-    DOM.imageTitle.value = STATE.imageTitle
-    toggleCanvasHidden()
-    ctx.drawImage(this, 0, 0)
+    STATE.imageTitle = imageObj.title;
+    clearChildren(DOM.images);
+    DOM.imageTitle.value = STATE.imageTitle;
+    toggleCanvasHidden();
+    ctx.drawImage(this, 0, 0);
     savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
-    STATE.undo.length = 0
-    STATE.undo.push(savedData)
-    STATE.canvasID = imageObj.id
+    STATE.undo.length = 0;
+    STATE.undo.push(savedData);
+    STATE.canvasID = imageObj.id;
   }
 }
 
@@ -745,6 +744,14 @@ function renderTextOptions() {
     textFontSize.value = STATE.text.ctxFontSize
     textFontSize.addEventListener('input', changeFontSize)
   DOM.toolOptions.append(renderToolHeader(), renderShapeFillOptions(), textOptions)
+}
+
+// REMOVE DOM ELEMENTS
+function clearChildren(element) {
+  let children = Array.from(element.children);
+  children.forEach(child => {
+    child.remove();
+  });
 }
 
 // CHANGE STATE FUNCTIONS
