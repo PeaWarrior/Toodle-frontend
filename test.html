@@ -37,7 +37,6 @@
 
         <div id="account-options">
           <div>
-            <!-- modal -->
             <button id="login-btn" type="button" class="btn authentication-btn mr-2" data-toggle="modal" data-target="#loginModal">
               Login
             </button>
@@ -59,9 +58,9 @@
     </nav>
 
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-2 columns sidebar-left">
-              <div class="row d-flex justify-content-center" id="tools">
+        <div class="d-flex columns">
+            <div class="sidebar-left container-sm">
+              <div class="row d-flex justify-content-around" id="tools">
                     <div class="d-flex flex-column">
                         <div class="commands d-flex flex-wrap justify-content-center">
                             <div class="flexitem" data-command="new" title="new"><i class="fas fa-plus"></i></div>
@@ -94,83 +93,83 @@
                     </div>
               </div>
 
-                  <div class="row d-flex justify-content-center" id="tool-options-container">
-                    <div id="tool-options" class="d-flex flex-column align-items-between">
-                      <template id="text-options-template">
-                        <div id="text-options" class="d-flex flex-column justify-content-center">
-                          <br>
-                          <div class="d-flex justify-content-between">
-                            <input type="text" value="" name="text-input" id="text-input" placeholder="Enter text here" class="btn"><br>
-                          </div><br>
-                          <div class="d-flex">
-                            <select id="text-font-family" class="btn select-option">
-                              <option value="Arial">Arial</option>
-                              <option value="Arial Narrow">Arial Narrow</option>
-                              <option value="Calibri">Calibri</option>
-                              <option value="Cambria">Cambria</option>
-                              <option value="Candara">Candara</option>
-                              <option value="Comic Sans MS">Comic Sans MS</option>
-                              <option value="Courier">Courier</option>
-                              <option value="Courier New">Courier New</option>
-                              <option value="Garamond">Garamond</option>
-                              <option value="Geneva">Geneva</option>
-                              <option value="Helvetica">Helvetica</option>
-                              <option value="Monaco">Monaco</option>
-                              <option value="Sans-serif">Sans-serif</option>
-                              <option value="Tahoma">Tahoma</option>
-                              <option value="Times">Times</option>
-                              <option value="Times New Roman">Times New Roman</option>
-                              <option value="Verdana">Verdana</option>
-                            </select>
-                            <input id="text-font-size" type="number" value="12" class="btn option-input select-option">
-                            <span id="text-span">px</span>
-                          </div>
-                        </div>
-                      </template>
-                      <template id="shape-fill-options-template">
-                        <div id="shape-fill-options" class="d-flex justify-content-between">
-                          <label for="shape-fill" class="select-label">Fill</label>
-                          <select id="shape-fill-select" class="btn select-option">
-                              <option value="outline">Outline</option>
-                              <option value="fill">Fill</option>
-                              <option value="outlineFill">Outline and fill</option>
-                          </select>
-                        </div>
-                      </template>
-                      <template id="blend-options-template">
-                        <div id="stroke-blend-options" class="d-flex justify-content-between">
-                            <label for="stroke-blend" class="select-label">Blend</label>
-                            <select id="stroke-blend-select" class="btn select-option">
-                                <option value="source-over">Normal</option>
-                                <option value="multiply">Multiply</option>
-                                <option value="screen">Screen</option>
-                                <option value="lighten">Lighten</option>
-                                <option value="darken">Darken</option>
-                                <option value="difference">Difference</option>
-                            </select>
-                        </div>
-                      </template>
-                      <template id="stroke-size-options-template">
-                        <div id="stroke-size-options" class="stroke-options">
-                          <label for="stroke-size">Size</label><br>
-                          <input type="range" min="1" max="100" value="5" id="stroke-size-slider">
-                          <input type="number" min="0" max="75" value="5" onClick="this.select();" class="btn option-input" id="stroke-size-input">
-                          <span>px</span>
-                        </div>
-                      </template>
-                      <template id="stroke-opacity-options-template">
-                        <div id="opacity-options" class="stroke-options">
-                          <label for="opacity">Opacity</label><br>
-                          <input type="range" min="0" max="100" value="100" name="opacity"id="stroke-opacity-slider">
-                          <input type="number" min="0" max="100" value="100" onClick="this.select();" class="btn option-input" id="stroke-opacity-input">
-                          <span>%</span>
-                        </div>
-                      </template>
+              <div class="row d-flex justify-content-center" id="tool-options-container">
+                <div id="tool-options" class="d-flex flex-column align-items-between">
+                  <template id="text-options-template">
+                    <div id="text-options" class="d-flex flex-column justify-content-center">
+                      <br>
+                      <div class="d-flex justify-content-between">
+                        <input type="text" value="" name="text-input" id="text-input" placeholder="Enter text here" class="btn"><br>
+                      </div><br>
+                      <div class="d-flex">
+                        <select id="text-font-family" class="btn select-option">
+                          <option value="Arial">Arial</option>
+                          <option value="Arial Narrow">Arial Narrow</option>
+                          <option value="Calibri">Calibri</option>
+                          <option value="Cambria">Cambria</option>
+                          <option value="Candara">Candara</option>
+                          <option value="Comic Sans MS">Comic Sans MS</option>
+                          <option value="Courier">Courier</option>
+                          <option value="Courier New">Courier New</option>
+                          <option value="Garamond">Garamond</option>
+                          <option value="Geneva">Geneva</option>
+                          <option value="Helvetica">Helvetica</option>
+                          <option value="Monaco">Monaco</option>
+                          <option value="Sans-serif">Sans-serif</option>
+                          <option value="Tahoma">Tahoma</option>
+                          <option value="Times">Times</option>
+                          <option value="Times New Roman">Times New Roman</option>
+                          <option value="Verdana">Verdana</option>
+                        </select>
+                        <input id="text-font-size" type="number" value="12" class="btn option-input selection-input">
+                        <span id="text-span">px</span>
+                      </div>
                     </div>
-                  </div>
+                  </template>
+                  <template id="shape-fill-options-template">
+                    <div id="shape-fill-options" class="d-flex justify-content-between">
+                      <label for="shape-fill" class="select-label">Fill</label>
+                      <select id="shape-fill-select" class="btn select-option">
+                          <option value="outline">Outline</option>
+                          <option value="fill">Fill</option>
+                          <option value="outlineFill">Outline and fill</option>
+                      </select>
+                    </div>
+                  </template>
+                  <template id="blend-options-template">
+                    <div id="stroke-blend-options" class="d-flex justify-content-between">
+                        <label for="stroke-blend" class="select-label">Blend</label>
+                        <select id="stroke-blend-select" class="btn select-option">
+                            <option value="source-over">Normal</option>
+                            <option value="multiply">Multiply</option>
+                            <option value="screen">Screen</option>
+                            <option value="lighten">Lighten</option>
+                            <option value="darken">Darken</option>
+                            <option value="difference">Difference</option>
+                        </select>
+                    </div>
+                  </template>
+                  <template id="stroke-size-options-template">
+                    <div id="stroke-size-options" class="stroke-options">
+                      <label for="stroke-size">Size</label><br>
+                      <input type="range" min="1" max="100" value="5" id="stroke-size-slider">
+                      <input type="number" min="0" max="75" value="5" onClick="this.select();" class="btn option-input" id="stroke-size-input">
+                      <span>px</span>
+                    </div>
+                  </template>
+                  <template id="stroke-opacity-options-template">
+                    <div id="opacity-options" class="stroke-options">
+                      <label for="opacity">Opacity</label><br>
+                      <input type="range" min="0" max="100" value="100" name="opacity"id="stroke-opacity-slider">
+                      <input type="number" min="0" max="100" value="100" onClick="this.select();" class="btn option-input" id="stroke-opacity-input">
+                      <span>%</span>
+                    </div>
+                  </template>
+                </div>
+              </div>
             </div>
 
-            <div class="col-md-10 columns">
+            <div class="columns">
                 <div id="form-div">
                   <form id="form">
                     <div class="form-group">
