@@ -1,3 +1,3 @@
-![Toodle](./images/toodle.png)
+![Toodle](./images/toodle-color.png)
 
 You decide.
