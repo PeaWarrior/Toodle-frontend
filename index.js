@@ -122,6 +122,8 @@ let savedData;
 STATE.activeTool = TOOLS.brush;
 STATE.currentFilter = "noFilter";
 let webcamInterval;
+let webcamMediaStream;
+let webcamMediaTracks = [];
 
 // RUN
 initCtx()
@@ -137,6 +139,10 @@ function toggleActiveTool() {
   STATE.activeTool = document.querySelector("[data-tool].activetool").dataset["tool"];
   clearChildren(DOM.toolOptions);
   renderOptions();
+  if (STATE.activeTool == TOOLS.photo) {
+    stopWebcamFeed();
+    clearCanvas();
+  }
 }
 
 function renderOptions() {
@@ -1154,6 +1160,8 @@ function noFilter(image) {
 function getWebcamFeed() {
   navigator.mediaDevices.getUserMedia({video: true, audio: false})
     .then(localMediaStream => {
+      webcamMediaStream = localMediaStream;
+      webcamMediaTracks = localMediaStream.getTracks();
       DOM.webcamFeedTag.srcObject = localMediaStream;
       DOM.webcamFeedTag.play();
       webcamInterval = setInterval(() => {
@@ -1165,6 +1173,7 @@ function getWebcamFeed() {
 
 function stopWebcamFeed() {
   clearInterval(webcamInterval);
+  webcamMediaTracks.forEach(track => track.stop())
   DOM.webcamFeedTag.src = null;
 }
 
