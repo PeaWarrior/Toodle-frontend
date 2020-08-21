@@ -1178,7 +1178,8 @@ function stopWebcamFeed() {
 }
 
 function takePhoto() {
-  let image = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
+  savedData = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
   clearInterval(webcamInterval);
-  ctx.putImageData(image, 0, 0);
+  ctx.putImageData(savedData, 0, 0);
+  STATE.undo.push(savedData);
 }
