@@ -66,6 +66,7 @@ const TOOLS = {
   eraser: 'eraser',
   text: 'text',
   photo: 'photo',
+  bucket: 'bucket',
 }
 
 const FILTERS = {
@@ -109,6 +110,9 @@ const STATE = {
     ctxFontSize: "40",
     ctxFontFamily: "Arial",
     textFill: 'outline'
+  },
+  bucket: {
+    fillColor: '#e84a4a',
   }
 }
 
@@ -116,7 +120,7 @@ const startPos = {x: 0, y: 0};
 const currentPos = {x: 0, y: 0};
 
 let points = [];
-
+let fillStack = [];
 let savedData;
 
 STATE.activeTool = TOOLS.brush;
@@ -444,8 +448,10 @@ function onMouseDown(e) {
   DOM.canvas.onmousemove = e => onMouseMove(e);
   document.onmouseup = e => onMouseUp(e);
   coords = getMouseCoordsOnCanvas(e);
+
   startPos.x = e.offsetX;
   startPos.y = e.offsetY;
+
   if (STATE.activeTool === TOOLS.brush) {
     ctx.clearRect(0, 0, DOM.canvas.width, DOM.canvas.height)
     ctx.putImageData(STATE.undo[STATE.undo.length-1], 0, 0)
@@ -453,6 +459,8 @@ function onMouseDown(e) {
     drawFreeLine()
   } else if (STATE.activeTool === TOOLS.text) {
     drawText();
+  } else if (STATE.activeTool === TOOLS.bucket) {
+    floodFillHelper(startPos, STATE.bucket.fillColor);
   }
 }
 
@@ -621,6 +629,50 @@ function erase() {
   ctx.globalCompositeOperation = STATE.stroke.blend
 }
 
+// FLOOD FILL FUNCTIONS
+function floodFillHelper(point, hexColor) {
+  console.log(`floodFillHelper: ${point}`)
+  const pixelColor = getPixel(point);
+  const color = hexToRGBArr(hexColor);
+  console.log(point);
+  floodFill(point, pixelColor, color);
+  fillColor();
+}
+
+function floodFill(point, targetColor, color) {
+  if (isColorMatch(targetColor, color)) return;
+
+  const currentNodeColor = getPixel(point);
+
+  if (isColorMatch(currentNodeColor, targetColor)) {
+    setPixel(point, color);
+
+    let eastPoint = {x: point.x + 1, y: point.y};
+    let westPoint =  {x: point.x - 1, y: point.y};
+    let northPoint = {x: point.x, y: point.y + 1};
+    let southPoint = {x: point.x, y: point.y - 1};
+
+    fillStack.push([eastPoint, targetColor, color]);
+    fillStack.push([westPoint, targetColor, color]);
+    fillStack.push([northPoint, targetColor, color]);
+    fillStack.push([southPoint, targetColor, color]);
+  }
+}
+
+function fillColor() {
+  if (fillStack.length) {
+    for (let i=0; i < fillStack.length; i++) {
+      floodFill(fillStack[i][0], fillStack[i][1], fillStack[i][2]);
+    }
+
+    fillStack.splice(0, fillStack.length);
+    fillColor();
+  } else {
+    ctx.putImageData(savedData, 0, 0);
+    fillStack.length = [];
+  }
+}
+
 // UTILITY FUNCTIONS
 function initCtx() {
   ctx.lineJoin = 'round'
@@ -632,7 +684,18 @@ function initCtx() {
 }
 
 function getMouseCoordsOnCanvas(e) {
-  return {x: e.offsetX, y: e.offsetY};
+  let roundedX = Math.ceil(e.offsetX);
+  let roundedY = Math.ceil(e.offsetY);
+
+  if (roundedX > 255) {
+    roundedX = 255;
+  }
+
+  if (roundedY > 255) {
+    roundedY = 255;
+  }
+
+  return {x: roundedX, y: roundedY};
 }
 
 function isLegitValue(input, min, max) {
@@ -688,6 +751,48 @@ function setDOMPropsWebcam() {
   DOM.stopWebcamBtn = document.querySelector('div#photo-buttons button#stop-webcam-btn');
   DOM.captureWebcamBtn = document.querySelector('div#photo-buttons button#capture-btn');
   DOM.filterSelect = document.querySelector('select#filter-select');
+}
+
+function isColorMatch(color1, color2) {
+  return (color1[0] === color2[0] 
+       && color1[1] === color2[1] 
+       && color1[2] === color2[2]
+       && color1[3] === color2[3])
+}
+
+function getPixel(point) {
+  if (point.x < 0 
+    || point.y < 0 
+    || point.x >= savedData.width 
+    || point.y >= savedData.height) {
+      return [-1, -1, -1, -1];
+  } else {
+    let pixelOffset = (point.y * savedData.width + point.x) * 4;
+    return [
+      savedData.data[pixelOffset + 0],
+      savedData.data[pixelOffset + 1],
+      savedData.data[pixelOffset + 2],
+      savedData.data[pixelOffset + 3]
+    ]
+  }
+}
+
+function setPixel(point, color) {
+  const pixelOffset = (point.y * savedData.width + point.x) * 4;
+  savedData.data[pixelOffset + 0] = color[0];
+  savedData.data[pixelOffset + 1] = color[1];
+  savedData.data[pixelOffset + 2] = color[2];
+  savedData.data[pixelOffset + 3] = color[3];
+}
+
+function hexToRGBArr(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+          parseInt(result[1], 16),
+          parseInt(result[2], 16),
+          parseInt(result[3], 16),
+          255
+         ] : null;
 }
 
 // COMMAND EVENTS
@@ -977,6 +1082,7 @@ function changeStrokeColor() {
 }
 
 function changeFillColor() {
+  STATE.bucket.fillColor = this.value;
   STATE.stroke.fillColor = hexToRGB(this.value);
   ctx.fillStyle = `rgba(${STATE.stroke.fillColor}, ${STATE.stroke.opacity})`;
 }
