@@ -82,6 +82,7 @@
                             <div class="flexitem" data-tool="eraser" title="eraser"><i class="fas fa-eraser"></i></div>
                             <div class="flexitem" data-tool="bucket" title="paint bucket"><i class="fas fa-fill-drip"></i></div>
                             <div class="flexitem" data-tool="text" title="text"><i class="fas fa-font"></i></div>
+                            <div class="flexitem" data-tool="photo" title="photo"><i class="fas fa-camera-retro"></i></div>
                             <div id="stroke-color-options" class="color-picker">
                               <input type="color" title="stroke color" class="color-input" id="stroke-color-input">
                               <input type="color" title="fill color" value="#FFFFFF"class="color-input" id="fill-color-input">
@@ -177,6 +178,28 @@
                       <input type="number" min="0" max="100" value="50" onClick="this.select();" class="btn option-input" id="inner-radius-input">
                     </div>
                   </template>
+                  <template id="filter-options-template">
+                    <div id="filter-options" class="d-flex justify-content-between">
+                        <label for="filter" class="select-label">Filter</label>
+                        <select id="filter-select" class="btn select-option">
+                            <option value="noFilter">No Filter</option>
+                            <option value="redShift">Red Shift</option>
+                            <option value="greenShift">Green Shift</option>
+                            <option value="blueShift">Blue Shift</option>
+                            <option value="scramble">Scramble</option>
+                            <option value="blackAndWhite">B&W</option>
+                        </select>
+                    </div>
+                  </template>
+                  <template id="photo-buttons-template">
+                    <div id="photo-buttons">
+                      <button id="start-webcam-btn">Start Webcam</button>
+                      <button id="stop-webcam-btn" hidden>Stop Webcam</button>
+                      <br>
+                      <button id="capture-btn">Take Photo</button>
+                      <br>
+                    </div>
+                  </template>
                 </div>
               </div>
             </div>
@@ -225,6 +248,7 @@
                     <div id="canvas-message">
                       <p></p>
                     </div>
+                    <video id="webcam-video" hidden></video>
                 </div>
             </div>
         </div>

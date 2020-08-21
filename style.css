@@ -57,6 +57,21 @@ nav {
     color: #f5f5dc;
 }
 
+div#photo-buttons {
+    text-align: center;
+}
+
+.photo-btn {
+    border: 1px solid #47abcc;
+    color: #fd9635;
+    margin-bottom: 10px;
+}
+
+.photo-btn:hover {
+    background: #47abcc;
+    color: #f5f5dc;
+}
+
 .columns {
     min-height: 90vh;
     min-width: 89vw;
@@ -195,6 +210,7 @@ input.color-input:hover {
 }
 
 .tool-header {
+    /* text-align: center; */
     color: #1c448e;
 }
 

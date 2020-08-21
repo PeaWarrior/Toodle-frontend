@@ -33,6 +33,7 @@ const DOM = {
   toolOptions: document.querySelector('div#tool-options'),
   strokeColorInput: document.querySelector('input#stroke-color-input'),
   fillColorInput: document.querySelector('input#fill-color-input'),
+  webcamFeedTag: document.querySelector('#webcam-video'),
 }
 
 const TEMPLATE = {
@@ -43,6 +44,8 @@ const TEMPLATE = {
   textOptions: document.querySelector('template#text-options-template'),
   starPointsOptions: document.querySelector('template#star-points-options-template'),
   innerRadiusOptions: document.querySelector('template#inner-radius-options-template'),
+  filterOptions: document.querySelector('template#filter-options-template'),
+  photoButtons: document.querySelector('template#photo-buttons-template'),
 }
 
 const baseURL = "http://localhost:3000";
@@ -62,6 +65,16 @@ const TOOLS = {
   brush: 'brush',
   eraser: 'eraser',
   text: 'text',
+  photo: 'photo',
+}
+
+const FILTERS = {
+  "noFilter": noFilter,
+  "redShift": redShift,
+  "greenShift": greenShift,
+  "blueShift": blueShift,
+  "scramble": scramble,
+  "blackAndWhite": blackAndWhite,
 }
 
 const STATE = {
@@ -75,6 +88,7 @@ const STATE = {
   imageTitle: "",
   canvasID: null,
   pressedKeys: new Set(),
+  currentFilter: undefined,
   stroke: {
     blend: 'source-over',
     brushColor: '0, 0, 0',
@@ -105,6 +119,8 @@ let points = [];
 let savedData;
 
 STATE.activeTool = TOOLS.brush;
+STATE.currentFilter = "noFilter";
+let webcamInterval;
 
 // RUN
 initCtx()
@@ -141,6 +157,10 @@ function renderOptions() {
       break;
     case TOOLS.text:
       renderTextOptions();
+      break;
+    case TOOLS.photo:
+      renderWebcamOptions();
+      setDOMPropsWebcam();
       break;
   }
 }
@@ -603,6 +623,7 @@ function initCtx() {
   ctx.fillStyle = `rgba(${STATE.stroke.fillColor}, ${STATE.stroke.opacity})`
   ctx.lineWidth = STATE.stroke.width
 }
+
 function getMouseCoordsOnCanvas(e) {
   return {x: e.offsetX, y: e.offsetY};
 }
@@ -653,6 +674,13 @@ String.prototype.capitalize = function() {
 
 function getCtxText() {
   return `${STATE.text.ctxFontSize}px ${STATE.text.ctxFontFamily}`;
+}
+
+function setDOMPropsWebcam() {
+  DOM.startWebcamBtn = document.querySelector('div#photo-buttons button#start-webcam-btn');
+  DOM.stopWebcamBtn = document.querySelector('div#photo-buttons button#stop-webcam-btn');
+  DOM.captureWebcamBtn = document.querySelector('div#photo-buttons button#capture-btn');
+  DOM.filterSelect = document.querySelector('select#filter-select');
 }
 
 // COMMAND EVENTS
@@ -775,6 +803,10 @@ function displayImageOnCanvas(imageObj) {
   }
 }
 
+function renderWebcamOptions() {
+  DOM.toolOptions.append(renderToolHeader(), renderPhotoButtons(), renderFilterOptions());
+}
+
 function renderBrushOptions() {
   DOM.toolOptions.append(renderToolHeader(), renderBlendOptions(), renderSizeOptions(), renderOpacityOptions())
 }
@@ -799,7 +831,7 @@ function renderEraserOptions() {
 function renderToolHeader() {
   const toolHeader = document.createElement('h5')
     toolHeader.classList = "tool-header"
-    toolHeader.innerText = `${STATE.activeTool.capitalize()} tool`
+    toolHeader.innerText = `${STATE.activeTool.capitalize()} Tool`
   return toolHeader
 }
 
@@ -873,6 +905,48 @@ function renderInnerRadiusOptions() {
   return innerRadiusOptions
 }
 
+function renderFilterOptions() {
+  const filterOptions = TEMPLATE.filterOptions.cloneNode(true).content.querySelector('div#filter-options');
+  const filterSelector = filterOptions.querySelector('select#filter-select');
+    filterSelector.value = STATE.currentFilter;
+    filterSelector.addEventListener('input', changeFilter);
+    return filterOptions;
+}
+
+function renderPhotoButtons() {
+  const photoButtonsDiv = TEMPLATE.photoButtons.cloneNode(true).content.querySelector('div#photo-buttons');
+
+  const startWebcamBtn = photoButtonsDiv.querySelector('button#start-webcam-btn');
+    startWebcamBtn.classList.add("btn", "photo-btn");
+    startWebcamBtn.addEventListener('click', () => {
+      DOM.startWebcamBtn.hidden = true;
+      DOM.stopWebcamBtn.hidden = false;
+      DOM.filterSelect.disabled = false;
+      getWebcamFeed();
+    });
+
+  const stopWebcamBtn = photoButtonsDiv.querySelector('button#stop-webcam-btn');
+    stopWebcamBtn.classList.add("btn", "photo-btn");
+    stopWebcamBtn.addEventListener('click', () => {
+      DOM.startWebcamBtn.hidden = false;
+      DOM.stopWebcamBtn.hidden = true;
+      stopWebcamFeed();
+      clearCanvas();
+    })
+
+  const captureBtn = photoButtonsDiv.querySelector('button#capture-btn');
+    captureBtn.classList.add("btn", "photo-btn");
+    captureBtn.addEventListener('click', () => {
+      DOM.filterSelect.disabled = true;
+      DOM.startWebcamBtn.hidden = false;
+      DOM.stopWebcamBtn.hidden = true;
+      takePhoto();
+      stopWebcamFeed();
+    });
+
+  return photoButtonsDiv;
+}
+
 // REMOVE DOM ELEMENTS
 function clearChildren(element) {
   let children = Array.from(element.children);
@@ -903,6 +977,10 @@ function changeFillColor() {
 function changeBlend() {
   STATE.stroke.blend = this.value
   ctx.globalCompositeOperation = STATE.stroke.blend
+}
+
+function changeFilter() {
+  STATE.currentFilter = this.value;
 }
 
 function changeStrokeSize() {
@@ -997,3 +1075,85 @@ function funcOnKeys(func, ...codes) {
 funcOnKeys(undoCanvas, "ControlLeft", "KeyZ");
 funcOnKeys(undoCanvas, "MetaLeft", "KeyZ");
 funcOnKeys(redoCanvas, "ShiftLeft", "KeyZ");
+
+// FILTER FUNCTIONS
+function applyFilter(filter) {
+  let filterImage = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
+  filterImage = filter(filterImage);
+  ctx.putImageData(filterImage, 0, 0);
+}
+
+function redShift(image) {
+  for (let i = 0; i < image.data.length; i+=4) {
+    image.data[i] = image.data[i] + 100;
+    image.data[i + 1] = image.data[i + 1] - 100;
+    image.data[i + 2] = image.data[i + 2] - 100;
+  }
+  return image;
+}
+
+function greenShift(image) {
+  for (let i = 0; i < image.data.length; i+=4) {
+    image.data[i] = image.data[i] - 100;
+    image.data[i + 1] = image.data[i + 1] + 100;
+    image.data[i + 2] = image.data[i + 2] - 100;
+  }
+  return image;
+}
+
+function blueShift(image) {
+  for (let i = 0; i < image.data.length; i+=4) {
+    image.data[i] = image.data[i] - 100;
+    image.data[i + 1] = image.data[i + 1] - 100;
+    image.data[i + 2] = image.data[i + 2] + 100;
+  }
+  return image;
+}
+
+function scramble(image) {
+  for (let i = 0; i < image.data.length; i+=4) {
+    image.data[i - 200] = image.data[i];
+    image.data[i + 100] = image.data[i + 1];
+    image.data[i - 200] = image.data[i + 2];
+  }
+  return image;
+}
+
+function blackAndWhite(image) {
+  for (let i = 0; i < image.data.length; i+=4) {
+    const avg = (image.data[i] + image.data[i+1] + image.data[i+2]) / 3;
+    image.data[i] = avg;
+    image.data[i + 1] = avg;
+    image.data[i + 2] = avg;
+  }
+
+  return image;
+}
+
+function noFilter(image) {
+  return image;
+}
+
+// WEBCAM FUNCTIONS
+function getWebcamFeed() {
+  navigator.mediaDevices.getUserMedia({video: true, audio: false})
+    .then(localMediaStream => {
+      DOM.webcamFeedTag.srcObject = localMediaStream;
+      DOM.webcamFeedTag.play();
+      webcamInterval = setInterval(() => {
+        ctx.drawImage(DOM.webcamFeedTag, 0, 0, DOM.canvas.width, DOM.canvas.height);
+        applyFilter(FILTERS[STATE.currentFilter]);
+      }, 150);
+    }).catch(err => console.log(err));
+}
+
+function stopWebcamFeed() {
+  clearInterval(webcamInterval);
+  DOM.webcamFeedTag.src = null;
+}
+
+function takePhoto() {
+  let image = ctx.getImageData(0, 0, DOM.canvas.width, DOM.canvas.height);
+  clearInterval(webcamInterval);
+  ctx.putImageData(image, 0, 0);
+}
