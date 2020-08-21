@@ -686,14 +686,6 @@ function getMouseCoordsOnCanvas(e) {
   let roundedX = Math.ceil(e.offsetX);
   let roundedY = Math.ceil(e.offsetY);
 
-  if (roundedX > 255) {
-    roundedX = 255;
-  }
-
-  if (roundedY > 255) {
-    roundedY = 255;
-  }
-
   return {x: roundedX, y: roundedY};
 }
 
