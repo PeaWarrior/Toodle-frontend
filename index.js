@@ -206,7 +206,6 @@ function patchUser(e) {
     .then(res => res.json())
     .then(user => {
       showFormSuccess(`username successfully updated to ${user.username}`);
-
     })
 
   DOM.editForm.reset();
@@ -306,7 +305,7 @@ function signup(username, password) {
         toggleCanvasHidden();
       }
     })
-    .catch(err => {
+    .catch(_ => {
       showFormError("username is taken");
     });
 }
@@ -340,7 +339,7 @@ function login(username, password) {
         toggleCanvasHidden();
       }
     })
-    .catch(err => {
+    .catch(_ => {
       showFormError("password doesn't match");
     });
 }
