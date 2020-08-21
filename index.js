@@ -111,9 +111,9 @@ const STATE = {
     ctxFontFamily: "Arial",
     textFill: 'outline'
   },
-  bucket: {
-    fillColor: '#e84a4a',
-  }
+  // bucket: {
+  //   fillColor: '#e84a4a',
+  // }
 }
 
 const startPos = {x: 0, y: 0};
@@ -172,6 +172,9 @@ function renderOptions() {
     case TOOLS.photo:
       renderWebcamOptions();
       setDOMPropsWebcam();
+      break;
+    case TOOLS.bucket:
+      renderBucketOptions();
       break;
   }
 }
@@ -459,7 +462,7 @@ function onMouseDown(e) {
   } else if (STATE.activeTool === TOOLS.text) {
     drawText();
   } else if (STATE.activeTool === TOOLS.bucket) {
-    floodFillHelper(startPos, STATE.bucket.fillColor);
+    floodFillHelper(startPos);
   }
 }
 
@@ -629,10 +632,10 @@ function erase() {
 }
 
 // FLOOD FILL FUNCTIONS
-function floodFillHelper(point, hexColor) {
+function floodFillHelper(point) {
   console.log(`floodFillHelper: ${point}`)
   const pixelColor = getPixel(point);
-  const color = hexToRGBArr(hexColor);
+  const color = hexToRGBArr();
   console.log(point);
   floodFill(point, pixelColor, color);
   fillColor();
@@ -777,13 +780,13 @@ function setPixel(point, color) {
 }
 
 function hexToRGBArr(hex) {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? [
-          parseInt(result[1], 16),
-          parseInt(result[2], 16),
-          parseInt(result[3], 16),
-          255
-         ] : null;
+  let rgb = STATE.stroke.brushColor.split(',')
+        return [
+          parseInt(rgb[0]),
+          parseInt(rgb[1]),
+          parseInt(rgb[2]),
+          (STATE.stroke.opacity * 255)
+         ];
 }
 
 // COMMAND EVENTS
@@ -912,6 +915,9 @@ function renderWebcamOptions() {
 
 function renderBrushOptions() {
   DOM.toolOptions.append(renderToolHeader(), renderBlendOptions(), renderSizeOptions(), renderOpacityOptions())
+}
+function renderBucketOptions() {
+  DOM.toolOptions.append(renderToolHeader(), renderOpacityOptions())
 }
 
 function renderShapeOptions() {
@@ -1073,7 +1079,7 @@ function changeStrokeColor() {
 }
 
 function changeFillColor() {
-  STATE.bucket.fillColor = this.value;
+  // STATE.bucket.fillColor = this.value;
   STATE.stroke.fillColor = hexToRGB(this.value);
   ctx.fillStyle = `rgba(${STATE.stroke.fillColor}, ${STATE.stroke.opacity})`;
 }
