@@ -75,6 +75,7 @@ const FILTERS = {
   "blueShift": blueShift,
   "scramble": scramble,
   "blackAndWhite": blackAndWhite,
+  "negative": negativeFilter,
 }
 
 const STATE = {
@@ -1125,6 +1126,21 @@ function blackAndWhite(image) {
     image.data[i] = avg;
     image.data[i + 1] = avg;
     image.data[i + 2] = avg;
+  }
+
+  return image;
+}
+
+function negativeFilter(image) {
+  const threshold = 60;
+  data = image.data;
+  
+  for (let i=0; i < data.length; i+=4) {
+    let r = data[i];
+    let g = data[i+1];
+    let b = data[i+2];
+    let v = (0.2126*r + 0.7152*g + 0.0722*b >= threshold) ? 255 : 0;
+    data[i] = data[i+1] = data[i+2] = v;
   }
 
   return image;
